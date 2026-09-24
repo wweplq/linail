@@ -12,1611 +12,356 @@
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      -webkit-tap-highlight-color: transparent;
-    }
-    
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; -webkit-tap-highlight-color: transparent; }
     :root {
-      --blue: #4A90E2;
-      --blue-dark: #2C6BB5;
-      --blue-light: #F0F7FF;
-      --blue-soft: #E8F2FF;
-      --bg: #F5F9FF;
-      --card: #FFFFFF;
-      --text: #1A2B4A;
-      --text-muted: #6B7C9E;
-      --text-soft: #A0AEC7;
-      --border: #E3EDF9;
-      --success: #34C759;
-      --success-light: #E8F8EC;
-      --warning: #FF9500;
-      --warning-light: #FFF8E6;
-      --danger: #FF3B30;
-      --danger-light: #FFF0F0;
+      --blue: #4A90E2; --blue-dark: #2C6BB5; --blue-light: #F0F7FF; --blue-soft: #E8F2FF;
+      --bg: #F5F9FF; --card: #FFFFFF; --text: #1A2B4A; --text-muted: #6B7C9E; --text-soft: #A0AEC7;
+      --border: #E3EDF9; --success: #34C759; --success-light: #E8F8EC;
+      --warning: #FF9500; --warning-light: #FFF8E6; --danger: #FF3B30; --danger-light: #FFF0F0;
       --shadow-sm: 0 2px 8px rgba(74, 144, 226, 0.06);
       --shadow-md: 0 8px 24px rgba(74, 144, 226, 0.10);
       --shadow-lg: 0 16px 40px rgba(74, 144, 226, 0.14);
       --shadow-glow: 0 8px 32px rgba(74, 144, 226, 0.32);
     }
-    
-    html, body {
-      background: var(--bg);
-      color: var(--text);
-      font-size: 16px;
-      font-weight: 500;
-      line-height: 1.5;
-      min-height: 100vh;
-      -webkit-font-smoothing: antialiased;
-    }
-    
+    html, body { background: var(--bg); color: var(--text); font-size: 16px; font-weight: 500; line-height: 1.5; min-height: 100vh; -webkit-font-smoothing: antialiased; }
     body { padding-bottom: 40px; }
     
-    /* ═══ DEMO SWITCH ═══ */
-    .demo-switch {
-      position: sticky; top: 0; z-index: 200;
-      background: rgba(26, 43, 74, 0.95);
-      backdrop-filter: blur(20px);
-      padding: 12px 16px;
-      display: flex; align-items: center; justify-content: center; gap: 8px;
-    }
-    .demo-label {
-      color: #FFF; font-size: 11px; font-weight: 700;
-      letter-spacing: 1.5px; margin-right: 8px; opacity: 0.5;
-      text-transform: uppercase;
-    }
-    .demo-btn {
-      padding: 8px 18px; border-radius: 999px; border: none;
-      font-size: 13px; font-weight: 600; cursor: pointer;
-      background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.7);
-      transition: all 0.25s;
-    }
-    .demo-btn.active {
-      background: linear-gradient(135deg, #4A90E2, #2C6BB5);
-      color: #FFF;
-      box-shadow: 0 4px 16px rgba(74,144,226,0.5);
-    }
-    
-    /* ═══ HEADER ═══ */
-    .header {
-      background: linear-gradient(135deg, #4A90E2 0%, #2C6BB5 100%);
-      padding: 20px 20px 24px;
-      border-radius: 0 0 32px 32px;
-      color: #FFFFFF;
-      position: relative;
-      overflow: hidden;
-    }
-    .header::before {
-      content: '';
-      position: absolute;
-      top: -50%; right: -30%;
-      width: 80%; height: 200%;
-      background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%);
-      pointer-events: none;
-    }
+    .header { background: linear-gradient(135deg, #4A90E2 0%, #2C6BB5 100%); padding: 20px 20px 24px; border-radius: 0 0 32px 32px; color: #FFFFFF; position: relative; overflow: hidden; }
+    .header::before { content: ''; position: absolute; top: -50%; right: -30%; width: 80%; height: 200%; background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%); pointer-events: none; }
     .header > * { position: relative; z-index: 1; }
-    
-    /* Полный хедер только на главной */
     .header-full { padding-bottom: 80px; }
-    
-    .header-top {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      margin-bottom: 4px;
-    }
+    .header-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 4px; }
     .header-user { display: flex; align-items: center; gap: 14px; flex: 1; min-width: 0; }
-    .avatar {
-      width: 48px; height: 48px; border-radius: 16px;
-      background: rgba(255,255,255,0.2);
-      backdrop-filter: blur(10px);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 22px;
-      border: 1.5px solid rgba(255,255,255,0.3);
-      overflow: hidden; flex-shrink: 0;
-    }
+    .avatar { width: 48px; height: 48px; border-radius: 16px; background: rgba(255,255,255,0.2); backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: center; font-size: 22px; border: 1.5px solid rgba(255,255,255,0.3); overflow: hidden; flex-shrink: 0; }
     .avatar img { width: 100%; height: 100%; object-fit: cover; }
     .header-title { font-size: 17px; font-weight: 700; letter-spacing: -0.2px; }
     .header-subtitle { font-size: 12px; font-weight: 500; opacity: 0.75; margin-top: 2px; }
-    .header-menu {
-      width: 44px; height: 44px;
-      background: rgba(255,255,255,0.15);
-      backdrop-filter: blur(10px);
-      border-radius: 14px;
-      border: 1.5px solid rgba(255,255,255,0.2);
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer; color: #FFF; font-size: 18px;
-      transition: all 0.2s;
-      flex-shrink: 0;
-    }
+    .header-menu { width: 44px; height: 44px; background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border-radius: 14px; border: 1.5px solid rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; cursor: pointer; color: #FFF; font-size: 18px; transition: all 0.2s; flex-shrink: 0; }
     .header-menu:active { transform: scale(0.95); }
-    
-    .header-date {
-      font-size: 32px;
-      font-weight: 800;
-      letter-spacing: -1px;
-      line-height: 1.1;
-      margin-bottom: 6px;
-      margin-top: 24px;
-    }
-    .header-date-sub {
-      font-size: 14px;
-      font-weight: 500;
-      opacity: 0.75;
-      margin-bottom: 24px;
-    }
-    
+    .header-date { font-size: 32px; font-weight: 800; letter-spacing: -1px; line-height: 1.1; margin-bottom: 6px; margin-top: 24px; }
+    .header-date-sub { font-size: 14px; font-weight: 500; opacity: 0.75; margin-bottom: 24px; }
     .header-actions { display: flex; gap: 10px; margin-top: 20px; }
-    .btn-glass {
-      flex: 1;
-      background: rgba(255,255,255,0.15);
-      backdrop-filter: blur(10px);
-      border: 1.5px solid rgba(255,255,255,0.25);
-      color: #FFF;
-      font-size: 14px;
-      font-weight: 600;
-      padding: 14px 16px;
-      border-radius: 16px;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
+    .btn-glass { flex: 1; background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border: 1.5px solid rgba(255,255,255,0.25); color: #FFF; font-size: 14px; font-weight: 600; padding: 14px 16px; border-radius: 16px; cursor: pointer; transition: all 0.2s; }
     .btn-glass:active { transform: scale(0.97); }
     
-    /* ═══ FLOATING STATS (только на главной) ═══ */
-    .floating-stats {
-      margin: -56px 20px 20px;
-      background: #FFF;
-      border-radius: 24px;
-      padding: 24px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      box-shadow: var(--shadow-lg);
-      position: relative;
-      z-index: 5;
-      max-width: 560px;
-      margin-left: auto;
-      margin-right: auto;
-    }
+    .floating-stats { margin: -56px 20px 20px; background: #FFF; border-radius: 24px; padding: 24px; display: flex; align-items: center; justify-content: space-between; box-shadow: var(--shadow-lg); position: relative; z-index: 5; max-width: 560px; margin-left: auto; margin-right: auto; }
     .stat-block { flex: 1; }
     .stat-block:last-child { text-align: right; }
-    .stat-value {
-      font-size: 36px;
-      font-weight: 800;
-      color: var(--blue);
-      letter-spacing: -1px;
-      line-height: 1;
-      margin-bottom: 8px;
-    }
-    .stat-label {
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      line-height: 1.3;
-    }
+    .stat-value { font-size: 36px; font-weight: 800; color: var(--blue); letter-spacing: -1px; line-height: 1; margin-bottom: 8px; }
+    .stat-label { font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; line-height: 1.3; }
     
-    /* ═══ CLIENT HEADER ═══ */
-    .client-header {
-      background: linear-gradient(135deg, #4A90E2 0%, #2C6BB5 100%);
-      padding: 48px 20px 40px;
-      border-radius: 0 0 32px 32px;
-      color: #FFF; text-align: center;
-      position: relative;
-      overflow: hidden;
-    }
-    .client-header::before {
-      content: '';
-      position: absolute;
-      top: -30%; right: -20%;
-      width: 80%; height: 160%;
-      background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%);
-      pointer-events: none;
-    }
+    .client-header { background: linear-gradient(135deg, #4A90E2 0%, #2C6BB5 100%); padding: 48px 20px 40px; border-radius: 0 0 32px 32px; color: #FFF; text-align: center; position: relative; overflow: hidden; }
+    .client-header::before { content: ''; position: absolute; top: -30%; right: -20%; width: 80%; height: 160%; background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%); pointer-events: none; }
     .client-header > * { position: relative; z-index: 1; }
-    .client-avatar {
-      width: 108px; height: 108px; border-radius: 36px;
-      background: rgba(255,255,255,0.2);
-      backdrop-filter: blur(10px);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 48px;
-      border: 2px solid rgba(255,255,255,0.35);
-      margin: 0 auto 20px; overflow: hidden;
-    }
+    .client-avatar { width: 108px; height: 108px; border-radius: 36px; background: rgba(255,255,255,0.2); backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: center; font-size: 48px; border: 2px solid rgba(255,255,255,0.35); margin: 0 auto 20px; overflow: hidden; }
     .client-avatar img { width: 100%; height: 100%; object-fit: cover; }
     .client-name { font-size: 26px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 6px; }
     .client-studio { font-size: 14px; font-weight: 500; opacity: 0.8; }
     
-    /* ═══ CONTENT ═══ */
-    .content {
-      padding: 20px;
-      max-width: 600px;
-      margin: 0 auto;
-      padding-bottom: 120px;
-    }
-    
-    /* ═══ CARDS ═══ */
-    .card {
-      background: var(--card);
-      border-radius: 24px;
-      padding: 22px;
-      box-shadow: var(--shadow-sm);
-      margin-bottom: 12px;
-    }
+    .content { padding: 20px; max-width: 600px; margin: 0 auto; padding-bottom: 120px; }
+    .card { background: var(--card); border-radius: 24px; padding: 22px; box-shadow: var(--shadow-sm); margin-bottom: 12px; }
     .card-elevated { box-shadow: var(--shadow-md); }
-    
     .card-row { display: flex; align-items: center; gap: 16px; }
-    .card-icon {
-      width: 52px; height: 52px; border-radius: 18px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 24px; flex-shrink: 0;
-      position: relative;
-      overflow: hidden;
-    }
-    .card-icon::before {
-      content: '';
-      position: absolute; inset: 0;
-      background: linear-gradient(135deg, rgba(255,255,255,0.5), transparent);
-      pointer-events: none;
-    }
-    .icon-bell { background: linear-gradient(135deg, #FFE5E5, #FFD0D0); }
-    .icon-chat { background: linear-gradient(135deg, #D8F5DD, #C0EEC9); }
-    .icon-clock { background: linear-gradient(135deg, #D6EAFF, #B8DBFF); }
+    .card-icon { width: 52px; height: 52px; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; position: relative; overflow: hidden; }
+    .card-icon::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(255,255,255,0.5), transparent); pointer-events: none; }
     .icon-money { background: linear-gradient(135deg, #FFF0D6, #FFE0B0); }
-    
     .card-content { flex: 1; min-width: 0; }
     .card-value { font-size: 26px; font-weight: 800; color: var(--text); line-height: 1.15; letter-spacing: -0.5px; }
     .card-label { font-size: 13px; font-weight: 600; color: var(--text-muted); margin-top: 3px; }
-    
-    .btn-green {
-      background: var(--success); color: #FFF;
-      font-size: 13px; font-weight: 700;
-      padding: 11px 20px; border-radius: 999px;
-      border: none; cursor: pointer;
-      box-shadow: 0 4px 12px rgba(52,199,89,0.3);
-      transition: all 0.2s;
-    }
+    .btn-green { background: var(--success); color: #FFF; font-size: 13px; font-weight: 700; padding: 11px 20px; border-radius: 999px; border: none; cursor: pointer; box-shadow: 0 4px 12px rgba(52,199,89,0.3); transition: all 0.2s; }
     .btn-green:active { transform: scale(0.96); }
     
-    /* ═══ SECTION ═══ */
-    .section-label {
-      font-size: 12px; font-weight: 700;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      margin-bottom: 14px;
-      padding-left: 4px;
-      margin-top: 24px;
-    }
+    .section-label { font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 14px; padding-left: 4px; margin-top: 24px; }
     .section-label:first-child { margin-top: 0; }
-    
-    /* ═══ WEEK TABLE ═══ */
-    .month-label {
-      font-size: 13px; font-weight: 700;
-      color: var(--blue);
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      margin-bottom: 14px;
-    }
-    .day-row {
-      display: grid;
-      grid-template-columns: 1fr auto auto;
-      gap: 16px;
-      padding: 14px 0;
-      border-bottom: 1px solid var(--border);
-      align-items: center;
-    }
+    .month-label { font-size: 13px; font-weight: 700; color: var(--blue); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 14px; }
+    .day-row { display: grid; grid-template-columns: 1fr auto auto; gap: 16px; padding: 14px 0; border-bottom: 1px solid var(--border); align-items: center; }
     .day-row:last-child { border-bottom: none; }
     .day-name { font-size: 15px; font-weight: 500; color: var(--text); }
-    .day-name.today {
-      color: var(--blue);
-      font-weight: 700;
-      position: relative;
-      padding-left: 14px;
-    }
-    .day-name.today::before {
-      content: '';
-      position: absolute;
-      left: 0; top: 50%;
-      transform: translateY(-50%);
-      width: 6px; height: 6px;
-      border-radius: 50%;
-      background: var(--blue);
-      box-shadow: 0 0 0 3px var(--blue-soft);
-    }
+    .day-name.today { color: var(--blue); font-weight: 700; position: relative; padding-left: 14px; }
+    .day-name.today::before { content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 6px; height: 6px; border-radius: 50%; background: var(--blue); box-shadow: 0 0 0 3px var(--blue-soft); }
     .day-count { font-size: 15px; font-weight: 700; color: var(--text); min-width: 30px; text-align: center; }
     .day-sum { font-size: 15px; font-weight: 600; color: var(--text-muted); min-width: 60px; text-align: right; }
-    .day-row.total {
-      border-top: 2px solid var(--border);
-      margin-top: 8px;
-      padding-top: 18px;
-      padding-bottom: 4px;
-    }
+    .day-row.total { border-top: 2px solid var(--border); margin-top: 8px; padding-top: 18px; padding-bottom: 4px; }
     .day-row.total .day-name { font-weight: 700; font-size: 16px; }
     .day-row.total .day-sum { color: var(--blue); font-weight: 800; font-size: 17px; }
     
-    /* ═══ CONTACTS ═══ */
     .contact-row { display: flex; align-items: center; gap: 14px; padding: 12px 0; }
-    .contact-icon {
-      font-size: 18px; width: 32px; height: 32px;
-      display: flex; align-items: center; justify-content: center;
-      background: var(--blue-soft);
-      border-radius: 10px;
-    }
+    .contact-icon { font-size: 18px; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; background: var(--blue-soft); border-radius: 10px; }
     .contact-text { font-size: 15px; font-weight: 500; color: var(--text); }
     
-    /* ═══ PRICE ═══ */
-    .price-item {
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 16px 0;
-      border-bottom: 1px solid var(--border);
-    }
+    .price-item { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 1px solid var(--border); }
     .price-item:last-child { border-bottom: none; }
     .price-info { flex: 1; }
     .price-name { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 3px; }
     .price-duration { font-size: 12px; font-weight: 500; color: var(--text-muted); }
-    .price-value {
-      font-size: 17px; font-weight: 800;
-      color: var(--blue);
-      white-space: nowrap;
-      letter-spacing: -0.3px;
-    }
+    .price-value { font-size: 17px; font-weight: 800; color: var(--blue); white-space: nowrap; letter-spacing: -0.3px; }
     
-    /* ═══ BUTTONS ═══ */
-    .btn-primary {
-      background: linear-gradient(135deg, #4A90E2 0%, #2C6BB5 100%);
-      color: #FFF;
-      font-size: 16px;
-      font-weight: 700;
-      padding: 18px 24px;
-      border-radius: 18px;
-      border: none;
-      cursor: pointer;
-      width: 100%;
-      letter-spacing: -0.2px;
-      box-shadow: var(--shadow-glow);
-      transition: all 0.2s;
-    }
+    .btn-primary { background: linear-gradient(135deg, #4A90E2 0%, #2C6BB5 100%); color: #FFF; font-size: 16px; font-weight: 700; padding: 18px 24px; border-radius: 18px; border: none; cursor: pointer; width: 100%; letter-spacing: -0.2px; box-shadow: var(--shadow-glow); transition: all 0.2s; }
     .btn-primary:active { transform: scale(0.98); }
-    
-    .btn-danger {
-      background: var(--danger-light);
-      color: var(--danger);
-      font-size: 15px; font-weight: 700;
-      padding: 16px 20px;
-      border-radius: 18px;
-      border: none; cursor: pointer; width: 100%;
-      transition: all 0.2s;
-    }
+    .btn-danger { background: var(--danger-light); color: var(--danger); font-size: 15px; font-weight: 700; padding: 16px 20px; border-radius: 18px; border: none; cursor: pointer; width: 100%; transition: all 0.2s; }
     .btn-danger:active { transform: scale(0.98); }
     
-    /* ═══ TIME GRID ═══ */
-    .time-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-    }
-    .time-slot {
-      padding: 16px 8px;
-      border-radius: 16px;
-      border: 1.5px solid var(--border);
-      background: #FFF;
-      text-align: center;
-      font-size: 15px;
-      font-weight: 600;
-      color: var(--text);
-      cursor: pointer;
-      transition: all 0.2s;
-    }
+    .time-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .time-slot { padding: 16px 8px; border-radius: 16px; border: 1.5px solid var(--border); background: #FFF; text-align: center; font-size: 15px; font-weight: 600; color: var(--text); cursor: pointer; transition: all 0.2s; }
     .time-slot:active { transform: scale(0.96); }
-    .time-slot.selected {
-      border-color: transparent;
-      background: linear-gradient(135deg, #4A90E2, #2C6BB5);
-      color: #FFF;
-      box-shadow: 0 6px 16px rgba(74,144,226,0.35);
-    }
+    .time-slot.selected { border-color: transparent; background: linear-gradient(135deg, #4A90E2, #2C6BB5); color: #FFF; box-shadow: 0 6px 16px rgba(74,144,226,0.35); }
     
-    /* ═══ INPUTS ═══ */
-    .input-field {
-      width: 100%;
-      padding: 16px 18px;
-      border-radius: 16px;
-      border: 1.5px solid var(--border);
-      font-size: 15px;
-      font-weight: 500;
-      color: var(--text);
-      background: #FFF;
-      outline: none;
-      transition: border-color 0.2s, box-shadow 0.2s;
-      font-family: inherit;
-    }
-    .input-field:focus {
-      border-color: var(--blue);
-      box-shadow: 0 0 0 4px var(--blue-soft);
-    }
+    .input-field { width: 100%; padding: 16px 18px; border-radius: 16px; border: 1.5px solid var(--border); font-size: 15px; font-weight: 500; color: var(--text); background: #FFF; outline: none; transition: border-color 0.2s, box-shadow 0.2s; font-family: inherit; }
+    .input-field:focus { border-color: var(--blue); box-shadow: 0 0 0 4px var(--blue-soft); }
     .input-field::placeholder { color: var(--text-soft); }
     
-    /* ═══ WINDOW ITEMS ═══ */
-    .window-item {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      padding: 18px;
-      border-radius: 20px;
-      background: #FFF;
-      border: 1.5px solid var(--border);
-      margin-bottom: 10px;
-    }
-    .window-item.booked {
-      background: linear-gradient(135deg, #FFF5F5, #FFEBEB);
-      border-color: #FFD5D5;
-    }
-    .window-item.free {
-      background: linear-gradient(135deg, #F0FBF3, #E5F8EB);
-      border-color: #C8ECD3;
-    }
-    .window-dot {
-      width: 10px; height: 10px; border-radius: 50%;
-      background: var(--success);
-      flex-shrink: 0;
-      box-shadow: 0 0 0 4px rgba(52,199,89,0.15);
-    }
-    .window-item.booked .window-dot {
-      background: var(--danger);
-      box-shadow: 0 0 0 4px rgba(255,59,48,0.15);
-    }
-    .window-time {
-      font-size: 16px; font-weight: 700;
-      color: var(--text); flex: 1;
-      letter-spacing: -0.2px;
-    }
-    .window-status {
-      font-size: 12px; font-weight: 700;
-      color: var(--success);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
+    .window-item { display: flex; align-items: center; gap: 14px; padding: 18px; border-radius: 20px; background: #FFF; border: 1.5px solid var(--border); margin-bottom: 10px; }
+    .window-item.booked { background: linear-gradient(135deg, #FFF5F5, #FFEBEB); border-color: #FFD5D5; }
+    .window-item.free { background: linear-gradient(135deg, #F0FBF3, #E5F8EB); border-color: #C8ECD3; }
+    .window-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--success); flex-shrink: 0; box-shadow: 0 0 0 4px rgba(52,199,89,0.15); }
+    .window-item.booked .window-dot { background: var(--danger); box-shadow: 0 0 0 4px rgba(255,59,48,0.15); }
+    .window-time { font-size: 16px; font-weight: 700; color: var(--text); flex: 1; letter-spacing: -0.2px; }
+    .window-status { font-size: 12px; font-weight: 700; color: var(--success); text-transform: uppercase; letter-spacing: 0.5px; }
     .window-item.booked .window-status { color: var(--danger); }
     .window-actions { display: flex; gap: 6px; }
-    .icon-btn {
-      width: 38px; height: 38px; border-radius: 12px;
-      border: none;
-      background: rgba(255,255,255,0.7);
-      cursor: pointer;
-      font-size: 15px;
-      display: flex; align-items: center; justify-content: center;
-      transition: all 0.2s;
-    }
+    .icon-btn { width: 38px; height: 38px; border-radius: 12px; border: none; background: rgba(255,255,255,0.7); cursor: pointer; font-size: 15px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
     .icon-btn:active { transform: scale(0.9); }
     
-    /* ═══ DATE NAV ═══ */
     .date-nav { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
-    .date-nav-btn {
-      width: 48px; height: 48px; border-radius: 16px;
-      border: 1.5px solid var(--border);
-      background: #FFF;
-      font-size: 20px; font-weight: 700;
-      color: var(--blue);
-      cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0;
-      transition: all 0.2s;
-      box-shadow: var(--shadow-sm);
-    }
-    .date-nav-btn:active {
-      transform: scale(0.94);
-      background: var(--blue-light);
-    }
-    .date-nav-center {
-      flex: 1; text-align: center;
-      font-size: 18px; font-weight: 800;
-      color: var(--text);
-      letter-spacing: -0.3px;
-    }
-    .date-nav-sub {
-      font-size: 13px; font-weight: 600;
-      color: var(--text-muted);
-      text-align: center;
-      margin-bottom: 16px;
-    }
+    .date-nav-btn { width: 48px; height: 48px; border-radius: 16px; border: 1.5px solid var(--border); background: #FFF; font-size: 20px; font-weight: 700; color: var(--blue); cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.2s; box-shadow: var(--shadow-sm); }
+    .date-nav-btn:active { transform: scale(0.94); background: var(--blue-light); }
+    .date-nav-center { flex: 1; text-align: center; font-size: 18px; font-weight: 800; color: var(--text); letter-spacing: -0.3px; }
+    .date-nav-sub { font-size: 13px; font-weight: 600; color: var(--text-muted); text-align: center; margin-bottom: 16px; }
     
-    /* ═══ VIEW TOGGLE ═══ */
-    .view-toggle {
-      display: flex;
-      background: #FFF;
-      border-radius: 18px;
-      padding: 5px;
-      margin-bottom: 20px;
-      box-shadow: var(--shadow-sm);
-    }
-    .view-toggle-btn {
-      flex: 1;
-      padding: 12px;
-      border-radius: 14px;
-      border: none;
-      background: transparent;
-      font-size: 14px; font-weight: 700;
-      color: var(--text-muted);
-      cursor: pointer;
-      transition: all 0.25s;
-    }
-    .view-toggle-btn.active {
-      background: linear-gradient(135deg, #4A90E2, #2C6BB5);
-      color: #FFF;
-      box-shadow: 0 4px 12px rgba(74,144,226,0.3);
-    }
+    .view-toggle { display: flex; background: #FFF; border-radius: 18px; padding: 5px; margin-bottom: 20px; box-shadow: var(--shadow-sm); }
+    .view-toggle-btn { flex: 1; padding: 12px; border-radius: 14px; border: none; background: transparent; font-size: 14px; font-weight: 700; color: var(--text-muted); cursor: pointer; transition: all 0.25s; }
+    .view-toggle-btn.active { background: linear-gradient(135deg, #4A90E2, #2C6BB5); color: #FFF; box-shadow: 0 4px 12px rgba(74,144,226,0.3); }
     
-    /* ═══ MONTH GRID ═══ */
-    .month-grid {
-      background: #FFF;
-      border-radius: 24px;
-      padding: 18px;
-      box-shadow: var(--shadow-md);
-      overflow-x: auto;
-    }
-    .month-grid-header {
-      display: grid;
-      grid-template-columns: 60px repeat(5, 1fr);
-      gap: 6px;
-      margin-bottom: 10px;
-      font-size: 12px; font-weight: 700;
-      color: var(--text-muted);
-      text-align: center;
-    }
-    .month-grid-row {
-      display: grid;
-      grid-template-columns: 60px repeat(5, 1fr);
-      gap: 6px;
-      margin-bottom: 5px;
-      align-items: center;
-    }
-    .month-grid-day {
-      font-size: 13px; font-weight: 600;
-      color: var(--text);
-      padding: 8px 4px;
-    }
+    .month-grid { background: #FFF; border-radius: 24px; padding: 18px; box-shadow: var(--shadow-md); overflow-x: auto; }
+    .month-grid-header { display: grid; grid-template-columns: 60px repeat(5, 1fr); gap: 6px; margin-bottom: 10px; font-size: 12px; font-weight: 700; color: var(--text-muted); text-align: center; }
+    .month-grid-row { display: grid; grid-template-columns: 60px repeat(5, 1fr); gap: 6px; margin-bottom: 5px; align-items: center; }
+    .month-grid-day { font-size: 13px; font-weight: 600; color: var(--text); padding: 8px 4px; }
     .month-grid-day.today { color: var(--blue); font-weight: 800; }
     .month-grid-day.weekend { color: var(--text-soft); }
-    .month-grid-cell {
-      height: 38px;
-      border-radius: 10px;
-      background: var(--success-light);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 11px; font-weight: 700;
-      color: var(--success);
-      cursor: pointer;
-      transition: all 0.2s;
-    }
+    .month-grid-cell { height: 38px; border-radius: 10px; background: var(--success-light); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: var(--success); cursor: pointer; transition: all 0.2s; }
     .month-grid-cell.booked { background: var(--danger-light); color: var(--danger); }
     .month-grid-cell.off { background: var(--bg); color: var(--text-soft); }
     .month-grid-cell:active { transform: scale(0.92); }
     
-    /* ═══ SERVICES ═══ */
-    .service-item {
-      background: #FFF;
-      border-radius: 20px;
-      padding: 18px;
-      margin-bottom: 10px;
-      box-shadow: var(--shadow-sm);
-    }
-    .service-item-header {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 12px;
-      margin-bottom: 10px;
-    }
-    .service-item-name {
-      font-size: 16px; font-weight: 700;
-      color: var(--text);
-      flex: 1; line-height: 1.3;
-      letter-spacing: -0.2px;
-    }
-    .service-item-price {
-      font-size: 20px; font-weight: 800;
-      color: var(--blue);
-      white-space: nowrap;
-      letter-spacing: -0.5px;
-    }
-    .service-item-meta {
-      display: flex;
-      gap: 12px;
-      font-size: 13px; font-weight: 500;
-      color: var(--text-muted);
-      margin-bottom: 14px;
-    }
+    .service-item { background: #FFF; border-radius: 20px; padding: 18px; margin-bottom: 10px; box-shadow: var(--shadow-sm); }
+    .service-item-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
+    .service-item-name { font-size: 16px; font-weight: 700; color: var(--text); flex: 1; line-height: 1.3; letter-spacing: -0.2px; }
+    .service-item-price { font-size: 20px; font-weight: 800; color: var(--blue); white-space: nowrap; letter-spacing: -0.5px; }
+    .service-item-meta { display: flex; gap: 12px; font-size: 13px; font-weight: 500; color: var(--text-muted); margin-bottom: 14px; }
     .service-item-actions { display: flex; gap: 8px; }
-    .service-action-btn {
-      flex: 1;
-      padding: 11px;
-      border-radius: 12px;
-      border: none;
-      font-size: 13px; font-weight: 700;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
+    .service-action-btn { flex: 1; padding: 11px; border-radius: 12px; border: none; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
     .service-action-btn:active { transform: scale(0.96); }
     .service-action-btn.edit { background: var(--blue-soft); color: var(--blue); }
-    .service-action-btn.delete {
-      background: var(--danger-light);
-      color: var(--danger);
-      flex: 0 0 46px;
-    }
+    .service-action-btn.delete { background: var(--danger-light); color: var(--danger); flex: 0 0 46px; }
     .service-action-btn.hide { background: var(--bg); color: var(--text-muted); }
     .service-hidden { opacity: 0.45; }
-    
-    .add-service-btn {
-      background: #FFF;
-      border: 2px dashed var(--blue);
-      color: var(--blue);
-      font-size: 15px; font-weight: 700;
-      padding: 20px;
-      border-radius: 20px;
-      cursor: pointer;
-      width: 100%;
-      margin-top: 10px;
-      transition: all 0.2s;
-    }
+    .add-service-btn { background: #FFF; border: 2px dashed var(--blue); color: var(--blue); font-size: 15px; font-weight: 700; padding: 20px; border-radius: 20px; cursor: pointer; width: 100%; margin-top: 10px; transition: all 0.2s; }
     .add-service-btn:active { background: var(--blue-light); transform: scale(0.98); }
     
-    /* ═══ FINANCE ═══ */
-    .finance-hero {
-      background: linear-gradient(135deg, #4A90E2 0%, #2C6BB5 100%);
-      border-radius: 28px;
-      padding: 28px;
-      color: #FFF;
-      margin-bottom: 20px;
-      box-shadow: var(--shadow-glow);
-      position: relative;
-      overflow: hidden;
-    }
-    .finance-hero::before {
-      content: '';
-      position: absolute;
-      top: -50%; right: -30%;
-      width: 80%; height: 200%;
-      background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%);
-      pointer-events: none;
-    }
+    .finance-hero { background: linear-gradient(135deg, #4A90E2 0%, #2C6BB5 100%); border-radius: 28px; padding: 28px; color: #FFF; margin-bottom: 20px; box-shadow: var(--shadow-glow); position: relative; overflow: hidden; }
+    .finance-hero::before { content: ''; position: absolute; top: -50%; right: -30%; width: 80%; height: 200%; background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%); pointer-events: none; }
     .finance-hero > * { position: relative; }
-    .finance-hero-label {
-      font-size: 12px; font-weight: 700;
-      opacity: 0.75;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      margin-bottom: 8px;
-    }
-    .finance-hero-value {
-      font-size: 42px; font-weight: 800;
-      letter-spacing: -1.5px;
-      line-height: 1;
-      margin-bottom: 24px;
-    }
-    .finance-hero-row {
-      display: flex;
-      gap: 20px;
-      padding-top: 20px;
-      border-top: 1px solid rgba(255,255,255,0.2);
-    }
+    .finance-hero-label { font-size: 12px; font-weight: 700; opacity: 0.75; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+    .finance-hero-value { font-size: 42px; font-weight: 800; letter-spacing: -1.5px; line-height: 1; margin-bottom: 24px; }
+    .finance-hero-row { display: flex; gap: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.2); }
     .finance-hero-stat { flex: 1; }
-    .finance-hero-stat-label {
-      font-size: 11px; font-weight: 600;
-      opacity: 0.75;
-      margin-bottom: 6px;
-      text-transform: uppercase;
-    }
-    .finance-hero-stat-value {
-      font-size: 20px; font-weight: 800;
-      letter-spacing: -0.3px;
-    }
+    .finance-hero-stat-label { font-size: 11px; font-weight: 600; opacity: 0.75; margin-bottom: 6px; text-transform: uppercase; }
+    .finance-hero-stat-value { font-size: 20px; font-weight: 800; letter-spacing: -0.3px; }
     
-    .finance-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-bottom: 20px;
-    }
-    .finance-tile {
-      background: #FFF;
-      border-radius: 20px;
-      padding: 18px;
-      box-shadow: var(--shadow-sm);
-    }
-    .finance-tile-icon {
-      font-size: 22px;
-      margin-bottom: 10px;
-      width: 40px; height: 40px;
-      background: var(--blue-soft);
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .finance-tile-label {
-      font-size: 11px; font-weight: 700;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-bottom: 6px;
-    }
-    .finance-tile-value {
-      font-size: 22px; font-weight: 800;
-      color: var(--text);
-      letter-spacing: -0.5px;
-    }
+    .finance-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+    .finance-tile { background: #FFF; border-radius: 20px; padding: 18px; box-shadow: var(--shadow-sm); }
+    .finance-tile-icon { font-size: 22px; margin-bottom: 10px; width: 40px; height: 40px; background: var(--blue-soft); border-radius: 12px; display: flex; align-items: center; justify-content: center; }
+    .finance-tile-label { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+    .finance-tile-value { font-size: 22px; font-weight: 800; color: var(--text); letter-spacing: -0.5px; }
     .finance-tile-value.income { color: var(--success); }
     .finance-tile-value.expense { color: var(--danger); }
     .finance-tile-value.blue { color: var(--blue); }
     
-    .period-nav {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 20px;
-      background: #FFF;
-      border-radius: 18px;
-      padding: 5px;
-      box-shadow: var(--shadow-sm);
-    }
-    .period-btn {
-      flex: 1;
-      padding: 12px;
-      border-radius: 14px;
-      border: none;
-      background: transparent;
-      font-size: 14px; font-weight: 700;
-      color: var(--text-muted);
-      cursor: pointer;
-      transition: all 0.25s;
-    }
-    .period-btn.active {
-      background: linear-gradient(135deg, #4A90E2, #2C6BB5);
-      color: #FFF;
-      box-shadow: 0 4px 12px rgba(74,144,226,0.3);
-    }
+    .period-nav { display: flex; gap: 8px; margin-bottom: 20px; background: #FFF; border-radius: 18px; padding: 5px; box-shadow: var(--shadow-sm); }
+    .period-btn { flex: 1; padding: 12px; border-radius: 14px; border: none; background: transparent; font-size: 14px; font-weight: 700; color: var(--text-muted); cursor: pointer; transition: all 0.25s; }
+    .period-btn.active { background: linear-gradient(135deg, #4A90E2, #2C6BB5); color: #FFF; box-shadow: 0 4px 12px rgba(74,144,226,0.3); }
     
-    .chart-container {
-      background: #FFF;
-      border-radius: 24px;
-      padding: 22px;
-      box-shadow: var(--shadow-sm);
-      margin-bottom: 16px;
-    }
-    .chart-title {
-      font-size: 15px; font-weight: 700;
-      color: var(--text);
-      margin-bottom: 18px;
-      letter-spacing: -0.2px;
-    }
-    .chart-bars {
-      display: flex;
-      align-items: flex-end;
-      gap: 10px;
-      height: 150px;
-      margin-bottom: 12px;
-    }
-    .chart-bar-wrap {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 8px;
-      height: 100%;
-      justify-content: flex-end;
-    }
-    .chart-bar {
-      width: 100%;
-      border-radius: 10px 10px 4px 4px;
-      background: linear-gradient(180deg, #4A90E2 0%, #2C6BB5 100%);
-      min-height: 4px;
-    }
-    .chart-bar-label {
-      font-size: 11px; font-weight: 700;
-      color: var(--text-muted);
-    }
+    .chart-container { background: #FFF; border-radius: 24px; padding: 22px; box-shadow: var(--shadow-sm); margin-bottom: 16px; }
+    .chart-title { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 18px; letter-spacing: -0.2px; }
+    .chart-bars { display: flex; align-items: flex-end; gap: 10px; height: 150px; margin-bottom: 12px; }
+    .chart-bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 8px; height: 100%; justify-content: flex-end; }
+    .chart-bar { width: 100%; border-radius: 10px 10px 4px 4px; background: linear-gradient(180deg, #4A90E2 0%, #2C6BB5 100%); min-height: 4px; }
+    .chart-bar-label { font-size: 11px; font-weight: 700; color: var(--text-muted); }
     
-    .transaction-item {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      padding: 16px 0;
-      border-bottom: 1px solid var(--border);
-    }
+    .transaction-item { display: flex; align-items: center; gap: 14px; padding: 16px 0; border-bottom: 1px solid var(--border); }
     .transaction-item:last-child { border-bottom: none; }
-    .transaction-icon {
-      width: 42px; height: 42px;
-      border-radius: 14px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 18px;
-      flex-shrink: 0;
-    }
+    .transaction-icon { width: 42px; height: 42px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
     .transaction-icon.income { background: var(--success-light); }
     .transaction-icon.expense { background: var(--danger-light); }
     .transaction-info { flex: 1; min-width: 0; }
-    .transaction-title {
-      font-size: 15px; font-weight: 600;
-      color: var(--text);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .transaction-date {
-      font-size: 12px; font-weight: 500;
-      color: var(--text-muted);
-      margin-top: 3px;
-    }
-    .transaction-amount {
-      font-size: 16px; font-weight: 800;
-      white-space: nowrap;
-      letter-spacing: -0.3px;
-    }
+    .transaction-title { font-size: 15px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .transaction-date { font-size: 12px; font-weight: 500; color: var(--text-muted); margin-top: 3px; }
+    .transaction-amount { font-size: 16px; font-weight: 800; white-space: nowrap; letter-spacing: -0.3px; }
     .transaction-amount.income { color: var(--success); }
     .transaction-amount.expense { color: var(--danger); }
     
-    .expense-category {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      padding: 16px;
-      border-radius: 18px;
-      border: 1.5px solid var(--border);
-      margin-bottom: 10px;
-      cursor: pointer;
-      transition: all 0.2s;
-      background: #FFF;
-    }
-    .expense-category.selected {
-      border-color: var(--blue);
-      background: var(--blue-light);
-    }
+    .expense-category { display: flex; align-items: center; gap: 14px; padding: 16px; border-radius: 18px; border: 1.5px solid var(--border); margin-bottom: 10px; cursor: pointer; transition: all 0.2s; background: #FFF; }
+    .expense-category.selected { border-color: var(--blue); background: var(--blue-light); }
     .expense-category-icon { font-size: 22px; width: 36px; text-align: center; }
     .expense-category-name { font-size: 15px; font-weight: 600; color: var(--text); }
     
-    .empty-finance {
-      text-align: center;
-      padding: 40px 20px;
-      color: var(--text-muted);
-    }
+    .empty-finance { text-align: center; padding: 40px 20px; color: var(--text-muted); }
     .empty-finance-icon { font-size: 48px; margin-bottom: 12px; opacity: 0.4; }
     .empty-finance-text { font-size: 14px; font-weight: 600; }
     
-    /* ═══ PROFILE ═══ */
     .profile-avatar-wrap { text-align: center; margin-bottom: 28px; }
-    .profile-avatar {
-      width: 128px; height: 128px;
-      border-radius: 44px;
-      background: linear-gradient(135deg, #4A90E2 0%, #2C6BB5 100%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 56px;
-      margin: 0 auto 16px;
-      overflow: hidden;
-      border: 4px solid #FFF;
-      box-shadow: var(--shadow-glow);
-    }
+    .profile-avatar { width: 128px; height: 128px; border-radius: 44px; background: linear-gradient(135deg, #4A90E2 0%, #2C6BB5 100%); display: flex; align-items: center; justify-content: center; font-size: 56px; margin: 0 auto 16px; overflow: hidden; border: 4px solid #FFF; box-shadow: var(--shadow-glow); }
     .profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
-    .profile-avatar-btn {
-      background: var(--blue-light);
-      color: var(--blue);
-      font-size: 14px; font-weight: 700;
-      padding: 12px 24px;
-      border-radius: 999px;
-      border: none;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
+    .profile-avatar-btn { background: var(--blue-light); color: var(--blue); font-size: 14px; font-weight: 700; padding: 12px 24px; border-radius: 999px; border: none; cursor: pointer; transition: all 0.2s; }
     .profile-avatar-btn:active { transform: scale(0.96); }
     
     .form-group { margin-bottom: 18px; }
-    .form-label {
-      display: block;
-      font-size: 12px; font-weight: 700;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-      margin-bottom: 10px;
-      padding-left: 4px;
-    }
-    .form-input {
-      width: 100%;
-      padding: 16px 18px;
-      border-radius: 16px;
-      border: 1.5px solid var(--border);
-      font-size: 15px;
-      font-weight: 500;
-      color: var(--text);
-      background: #FFF;
-      outline: none;
-      transition: border-color 0.2s, box-shadow 0.2s;
-      font-family: inherit;
-    }
-    .form-input:focus {
-      border-color: var(--blue);
-      box-shadow: 0 0 0 4px var(--blue-soft);
-    }
-    .form-textarea {
-      resize: vertical;
-      min-height: 90px;
-      font-family: inherit;
-    }
+    .form-label { display: block; font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 10px; padding-left: 4px; }
+    .form-input { width: 100%; padding: 16px 18px; border-radius: 16px; border: 1.5px solid var(--border); font-size: 15px; font-weight: 500; color: var(--text); background: #FFF; outline: none; transition: border-color 0.2s, box-shadow 0.2s; font-family: inherit; }
+    .form-input:focus { border-color: var(--blue); box-shadow: 0 0 0 4px var(--blue-soft); }
+    .form-textarea { resize: vertical; min-height: 90px; font-family: inherit; }
     
-    /* ═══ SERVICE OPTION ═══ */
-    .service-option {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      padding: 16px;
-      border-radius: 18px;
-      border: 1.5px solid var(--border);
-      margin-bottom: 10px;
-      cursor: pointer;
-      transition: all 0.2s;
-      background: #FFF;
-    }
-    .service-option.selected {
-      border-color: transparent;
-      background: var(--blue-light);
-      box-shadow: 0 0 0 2px var(--blue) inset;
-    }
-    .service-radio {
-      width: 22px; height: 22px;
-      border-radius: 50%;
-      border: 2px solid var(--border);
-      flex-shrink: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.2s;
-    }
-    .service-option.selected .service-radio {
-      border-color: var(--blue);
-      background: var(--blue);
-    }
-    .service-option.selected .service-radio::after {
-      content: '';
-      width: 8px; height: 8px;
-      border-radius: 50%;
-      background: #FFF;
-    }
+    .service-option { display: flex; align-items: center; gap: 14px; padding: 16px; border-radius: 18px; border: 1.5px solid var(--border); margin-bottom: 10px; cursor: pointer; transition: all 0.2s; background: #FFF; }
+    .service-option.selected { border-color: transparent; background: var(--blue-light); box-shadow: 0 0 0 2px var(--blue) inset; }
+    .service-radio { width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--border); flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+    .service-option.selected .service-radio { border-color: var(--blue); background: var(--blue); }
+    .service-option.selected .service-radio::after { content: ''; width: 8px; height: 8px; border-radius: 50%; background: #FFF; }
     .service-info { flex: 1; }
     .service-name { font-size: 15px; font-weight: 700; color: var(--text); letter-spacing: -0.2px; }
     .service-details { font-size: 13px; font-weight: 500; color: var(--text-muted); margin-top: 3px; }
     
     .booking-step { margin-bottom: 26px; }
-    .booking-step-title {
-      font-size: 12px; font-weight: 700;
-      color: var(--blue);
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      margin-bottom: 14px;
-    }
+    .booking-step-title { font-size: 12px; font-weight: 700; color: var(--blue); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 14px; }
     
-    /* ═══ CLIENTS ═══ */
     .search-bar { position: relative; margin-bottom: 16px; }
-    .search-input {
-      width: 100%;
-      padding: 16px 18px 16px 48px;
-      border-radius: 18px;
-      border: 1.5px solid transparent;
-      font-size: 15px;
-      font-weight: 500;
-      color: var(--text);
-      background: #FFF;
-      outline: none;
-      font-family: inherit;
-      box-shadow: var(--shadow-sm);
-      transition: all 0.2s;
-    }
-    .search-input:focus {
-      border-color: var(--blue);
-      box-shadow: 0 0 0 4px var(--blue-soft);
-    }
+    .search-input { width: 100%; padding: 16px 18px 16px 48px; border-radius: 18px; border: 1.5px solid transparent; font-size: 15px; font-weight: 500; color: var(--text); background: #FFF; outline: none; font-family: inherit; box-shadow: var(--shadow-sm); transition: all 0.2s; }
+    .search-input:focus { border-color: var(--blue); box-shadow: 0 0 0 4px var(--blue-soft); }
     .search-input::placeholder { color: var(--text-soft); }
-    .search-icon {
-      position: absolute;
-      left: 18px; top: 50%;
-      transform: translateY(-50%);
-      font-size: 17px;
-      pointer-events: none;
-      opacity: 0.5;
-    }
+    .search-icon { position: absolute; left: 18px; top: 50%; transform: translateY(-50%); font-size: 17px; pointer-events: none; opacity: 0.5; }
     
-    .client-filters {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 20px;
-      overflow-x: auto;
-      padding-bottom: 4px;
-      scrollbar-width: none;
-    }
+    .client-filters { display: flex; gap: 8px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
     .client-filters::-webkit-scrollbar { display: none; }
-    .filter-chip {
-      padding: 11px 18px;
-      border-radius: 999px;
-      border: 1.5px solid var(--border);
-      background: #FFF;
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--text-muted);
-      cursor: pointer;
-      white-space: nowrap;
-      transition: all 0.25s;
-    }
-    .filter-chip.active {
-      background: linear-gradient(135deg, #4A90E2, #2C6BB5);
-      border-color: transparent;
-      color: #FFF;
-      box-shadow: 0 4px 12px rgba(74,144,226,0.3);
-    }
+    .filter-chip { padding: 11px 18px; border-radius: 999px; border: 1.5px solid var(--border); background: #FFF; font-size: 13px; font-weight: 700; color: var(--text-muted); cursor: pointer; white-space: nowrap; transition: all 0.25s; }
+    .filter-chip.active { background: linear-gradient(135deg, #4A90E2, #2C6BB5); border-color: transparent; color: #FFF; box-shadow: 0 4px 12px rgba(74,144,226,0.3); }
     
-    .client-item {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      padding: 16px;
-      background: #FFF;
-      border-radius: 20px;
-      margin-bottom: 10px;
-      cursor: pointer;
-      transition: all 0.2s;
-      box-shadow: var(--shadow-sm);
-    }
+    .client-item { display: flex; align-items: center; gap: 14px; padding: 16px; background: #FFF; border-radius: 20px; margin-bottom: 10px; cursor: pointer; transition: all 0.2s; box-shadow: var(--shadow-sm); }
     .client-item:active { transform: scale(0.98); box-shadow: var(--shadow-md); }
-    .client-avatar-sm {
-      width: 52px; height: 52px;
-      border-radius: 18px;
-      background: linear-gradient(135deg, #4A90E2 0%, #2C6BB5 100%);
-      color: #FFF;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 18px;
-      font-weight: 800;
-      flex-shrink: 0;
-      text-transform: uppercase;
-      letter-spacing: -0.5px;
-    }
+    .client-avatar-sm { width: 52px; height: 52px; border-radius: 18px; background: linear-gradient(135deg, #4A90E2 0%, #2C6BB5 100%); color: #FFF; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 800; flex-shrink: 0; text-transform: uppercase; letter-spacing: -0.5px; }
     .client-item-info { flex: 1; min-width: 0; }
-    .client-item-name {
-      font-size: 15px; font-weight: 700;
-      color: var(--text);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .client-item-meta {
-      font-size: 12px; font-weight: 500;
-      color: var(--text-muted);
-      margin-top: 3px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
+    .client-item-name { font-size: 15px; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .client-item-meta { font-size: 12px; font-weight: 500; color: var(--text-muted); margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .client-item-stats { text-align: right; flex-shrink: 0; }
-    .client-item-count {
-      font-size: 16px; font-weight: 800;
-      color: var(--blue);
-      letter-spacing: -0.3px;
-    }
-    .client-item-sum {
-      font-size: 11px; font-weight: 600;
-      color: var(--text-muted);
-      margin-top: 3px;
-    }
+    .client-item-count { font-size: 16px; font-weight: 800; color: var(--blue); letter-spacing: -0.3px; }
+    .client-item-sum { font-size: 11px; font-weight: 600; color: var(--text-muted); margin-top: 3px; }
     
     .client-profile-header { text-align: center; padding: 20px 0 28px; }
-    .client-profile-avatar {
-      width: 96px; height: 96px;
-      border-radius: 32px;
-      background: linear-gradient(135deg, #4A90E2 0%, #2C6BB5 100%);
-      color: #FFF;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 38px;
-      font-weight: 800;
-      margin: 0 auto 16px;
-      text-transform: uppercase;
-      letter-spacing: -1px;
-      box-shadow: var(--shadow-glow);
-    }
-    .client-profile-name {
-      font-size: 24px; font-weight: 800;
-      color: var(--text);
-      margin-bottom: 8px;
-      letter-spacing: -0.5px;
-    }
-    .client-profile-tag {
-      display: inline-block;
-      padding: 6px 14px;
-      border-radius: 999px;
-      font-size: 11px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-      background: var(--blue-light);
-      color: var(--blue);
-    }
+    .client-profile-avatar { width: 96px; height: 96px; border-radius: 32px; background: linear-gradient(135deg, #4A90E2 0%, #2C6BB5 100%); color: #FFF; display: flex; align-items: center; justify-content: center; font-size: 38px; font-weight: 800; margin: 0 auto 16px; text-transform: uppercase; letter-spacing: -1px; box-shadow: var(--shadow-glow); }
+    .client-profile-name { font-size: 24px; font-weight: 800; color: var(--text); margin-bottom: 8px; letter-spacing: -0.5px; }
+    .client-profile-tag { display: inline-block; padding: 6px 14px; border-radius: 999px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; background: var(--blue-light); color: var(--blue); }
     .client-profile-tag.sleeping { background: var(--warning-light); color: #8A6D00; }
     .client-profile-tag.new { background: var(--success-light); color: var(--success); }
     
-    .info-row {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      padding: 14px 0;
-      border-bottom: 1px solid var(--border);
-    }
+    .info-row { display: flex; align-items: center; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--border); }
     .info-row:last-child { border-bottom: none; }
-    .info-icon {
-      font-size: 16px;
-      width: 32px; height: 32px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: var(--blue-soft);
-      border-radius: 10px;
-      flex-shrink: 0;
-    }
-    .info-label {
-      font-size: 13px; font-weight: 500;
-      color: var(--text-muted);
-      flex: 1;
-    }
-    .info-value {
-      font-size: 14px; font-weight: 700;
-      color: var(--text);
-      text-align: right;
-      max-width: 60%;
-      word-break: break-word;
-    }
+    .info-icon { font-size: 16px; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; background: var(--blue-soft); border-radius: 10px; flex-shrink: 0; }
+    .info-label { font-size: 13px; font-weight: 500; color: var(--text-muted); flex: 1; }
+    .info-value { font-size: 14px; font-weight: 700; color: var(--text); text-align: right; max-width: 60%; word-break: break-word; }
     
-    .client-action-buttons {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 20px;
-    }
-    .client-action-btn {
-      flex: 1;
-      padding: 16px 8px;
-      border-radius: 18px;
-      border: none;
-      font-size: 11px;
-      font-weight: 700;
-      cursor: pointer;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 6px;
-      transition: all 0.2s;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
+    .client-action-buttons { display: flex; gap: 10px; margin-bottom: 20px; }
+    .client-action-btn { flex: 1; padding: 16px 8px; border-radius: 18px; border: none; font-size: 11px; font-weight: 700; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 6px; transition: all 0.2s; text-transform: uppercase; letter-spacing: 0.5px; }
     .client-action-btn:active { transform: scale(0.96); }
-    .client-action-btn.primary {
-      background: linear-gradient(135deg, #4A90E2, #2C6BB5);
-      color: #FFF;
-      box-shadow: 0 6px 16px rgba(74,144,226,0.35);
-    }
-    .client-action-btn.secondary {
-      background: #FFF;
-      color: var(--blue);
-      box-shadow: var(--shadow-sm);
-    }
+    .client-action-btn.primary { background: linear-gradient(135deg, #4A90E2, #2C6BB5); color: #FFF; box-shadow: 0 6px 16px rgba(74,144,226,0.35); }
+    .client-action-btn.secondary { background: #FFF; color: var(--blue); box-shadow: var(--shadow-sm); }
     .client-action-btn-icon { font-size: 22px; }
     
-    .visit-item {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      padding: 14px 0;
-      border-bottom: 1px solid var(--border);
-    }
+    .visit-item { display: flex; align-items: center; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--border); }
     .visit-item:last-child { border-bottom: none; }
     .visit-date-block { text-align: center; width: 48px; flex-shrink: 0; }
-    .visit-day {
-      font-size: 20px; font-weight: 800;
-      color: var(--text);
-      line-height: 1;
-      letter-spacing: -0.5px;
-    }
-    .visit-month {
-      font-size: 10px; font-weight: 700;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      margin-top: 4px;
-    }
+    .visit-day { font-size: 20px; font-weight: 800; color: var(--text); line-height: 1; letter-spacing: -0.5px; }
+    .visit-month { font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; }
     .visit-info { flex: 1; min-width: 0; }
-    .visit-service {
-      font-size: 14px; font-weight: 700;
-      color: var(--text);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      letter-spacing: -0.2px;
-    }
-    .visit-time {
-      font-size: 12px; font-weight: 500;
-      color: var(--text-muted);
-      margin-top: 3px;
-    }
-    .visit-amount {
-      font-size: 16px; font-weight: 800;
-      color: var(--blue);
-      flex-shrink: 0;
-      letter-spacing: -0.3px;
-    }
+    .visit-service { font-size: 14px; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; letter-spacing: -0.2px; }
+    .visit-time { font-size: 12px; font-weight: 500; color: var(--text-muted); margin-top: 3px; }
+    .visit-amount { font-size: 16px; font-weight: 800; color: var(--blue); flex-shrink: 0; letter-spacing: -0.3px; }
     
-    /* ═══ BOOKING CARD ═══ */
-    .booking-card {
-      background: #FFF;
-      border-radius: 20px;
-      padding: 20px;
-      box-shadow: var(--shadow-sm);
-      margin-bottom: 12px;
-      border-left: 4px solid var(--blue);
-    }
-    .booking-date {
-      font-size: 12px; font-weight: 800;
-      color: var(--blue);
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-      margin-bottom: 8px;
-    }
-    .booking-service {
-      font-size: 17px; font-weight: 800;
-      color: var(--text);
-      margin-bottom: 4px;
-      letter-spacing: -0.3px;
-    }
-    .booking-price {
-      font-size: 15px; font-weight: 700;
-      color: var(--text-muted);
-      margin-bottom: 14px;
-    }
-    .booking-warning {
-      background: var(--warning-light);
-      border-radius: 12px;
-      padding: 12px 14px;
-      font-size: 12px;
-      font-weight: 600;
-      color: #8A6D00;
-      line-height: 1.6;
-    }
+    .booking-card { background: #FFF; border-radius: 20px; padding: 20px; box-shadow: var(--shadow-sm); margin-bottom: 12px; border-left: 4px solid var(--blue); }
+    .booking-date { font-size: 12px; font-weight: 800; color: var(--blue); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; }
+    .booking-service { font-size: 17px; font-weight: 800; color: var(--text); margin-bottom: 4px; letter-spacing: -0.3px; }
+    .booking-price { font-size: 15px; font-weight: 700; color: var(--text-muted); margin-bottom: 14px; }
+    .booking-warning { background: var(--warning-light); border-radius: 12px; padding: 12px 14px; font-size: 12px; font-weight: 600; color: #8A6D00; line-height: 1.6; }
     
-    .empty-clients {
-      text-align: center;
-      padding: 60px 20px;
-      color: var(--text-muted);
-    }
+    .empty-clients { text-align: center; padding: 60px 20px; color: var(--text-muted); }
     .empty-clients-icon { font-size: 56px; margin-bottom: 16px; opacity: 0.4; }
     .empty-clients-text { font-size: 15px; font-weight: 600; }
     
-    /* ═══ REMINDERS ═══ */
-    .reminder-stats {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-bottom: 20px;
-    }
-    .reminder-stat-card {
-      background: #FFF;
-      border-radius: 20px;
-      padding: 20px;
-      box-shadow: var(--shadow-sm);
-      text-align: center;
-    }
-    .reminder-stat-value {
-      font-size: 32px; font-weight: 800;
-      color: var(--blue);
-      line-height: 1;
-      margin-bottom: 8px;
-      letter-spacing: -1px;
-    }
+    .reminder-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+    .reminder-stat-card { background: #FFF; border-radius: 20px; padding: 20px; box-shadow: var(--shadow-sm); text-align: center; }
+    .reminder-stat-value { font-size: 32px; font-weight: 800; color: var(--blue); line-height: 1; margin-bottom: 8px; letter-spacing: -1px; }
     .reminder-stat-value.warning { color: var(--warning); }
     .reminder-stat-value.success { color: var(--success); }
-    .reminder-stat-label {
-      font-size: 11px; font-weight: 700;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-    }
+    .reminder-stat-label { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.8px; }
     
-    .reminder-item {
-      background: #FFF;
-      border-radius: 20px;
-      padding: 18px;
-      margin-bottom: 10px;
-      box-shadow: var(--shadow-sm);
-      border-left: 4px solid var(--blue);
-    }
+    .reminder-item { background: #FFF; border-radius: 20px; padding: 18px; margin-bottom: 10px; box-shadow: var(--shadow-sm); border-left: 4px solid var(--blue); }
     .reminder-item.sent { border-left-color: var(--success); background: linear-gradient(135deg, #F0FBF3, #FFFFFF); }
     .reminder-item.scheduled { border-left-color: var(--warning); background: linear-gradient(135deg, #FFF8E6, #FFFFFF); }
     .reminder-item.no-tg { border-left-color: var(--danger); background: linear-gradient(135deg, #FFF0F0, #FFFFFF); }
-    
-    .reminder-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 12px;
-      margin-bottom: 12px;
-    }
-    .reminder-client {
-      font-size: 16px; font-weight: 800;
-      color: var(--text);
-      flex: 1;
-      letter-spacing: -0.2px;
-    }
-    .reminder-status-badge {
-      padding: 5px 12px;
-      border-radius: 999px;
-      font-size: 10px; font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-      white-space: nowrap;
-    }
+    .reminder-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 12px; }
+    .reminder-client { font-size: 16px; font-weight: 800; color: var(--text); flex: 1; letter-spacing: -0.2px; }
+    .reminder-status-badge { padding: 5px 12px; border-radius: 999px; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; white-space: nowrap; }
     .reminder-status-badge.sent { background: var(--success); color: #FFF; }
     .reminder-status-badge.scheduled { background: var(--warning); color: #FFF; }
     .reminder-status-badge.no-tg { background: var(--danger); color: #FFF; }
-    
-    .reminder-meta {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      font-size: 13px;
-      color: var(--text-muted);
-    }
-    .reminder-meta-item {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-weight: 500;
-    }
+    .reminder-meta { display: flex; flex-direction: column; gap: 8px; font-size: 13px; color: var(--text-muted); }
+    .reminder-meta-item { display: flex; align-items: center; gap: 10px; font-weight: 500; }
     .reminder-meta-item strong { color: var(--text); font-weight: 700; }
     
-    /* ═══ SETTINGS ═══ */
-    .setting-item {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      padding: 18px 0;
-      border-bottom: 1px solid var(--border);
-    }
+    .setting-item { display: flex; align-items: center; gap: 16px; padding: 18px 0; border-bottom: 1px solid var(--border); }
     .setting-item:last-child { border-bottom: none; }
-    .setting-icon {
-      font-size: 22px;
-      width: 44px; height: 44px;
-      background: var(--blue-soft);
-      border-radius: 14px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
+    .setting-icon { font-size: 22px; width: 44px; height: 44px; background: var(--blue-soft); border-radius: 14px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .setting-content { flex: 1; min-width: 0; }
-    .setting-title {
-      font-size: 15px; font-weight: 700;
-      color: var(--text);
-      letter-spacing: -0.2px;
-    }
-    .setting-desc {
-      font-size: 12px; font-weight: 500;
-      color: var(--text-muted);
-      margin-top: 3px;
-      line-height: 1.4;
-    }
-    .toggle {
-      width: 50px; height: 30px;
-      border-radius: 999px;
-      background: var(--border);
-      position: relative;
-      cursor: pointer;
-      transition: background 0.2s;
-      flex-shrink: 0;
-    }
-    .toggle::after {
-      content: '';
-      position: absolute;
-      top: 3px; left: 3px;
-      width: 24px; height: 24px;
-      border-radius: 50%;
-      background: #FFF;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.15);
-      transition: transform 0.2s;
-    }
+    .setting-title { font-size: 15px; font-weight: 700; color: var(--text); letter-spacing: -0.2px; }
+    .setting-desc { font-size: 12px; font-weight: 500; color: var(--text-muted); margin-top: 3px; line-height: 1.4; }
+    .toggle { width: 50px; height: 30px; border-radius: 999px; background: var(--border); position: relative; cursor: pointer; transition: background 0.2s; flex-shrink: 0; }
+    .toggle::after { content: ''; position: absolute; top: 3px; left: 3px; width: 24px; height: 24px; border-radius: 50%; background: #FFF; box-shadow: 0 2px 4px rgba(0,0,0,0.15); transition: transform 0.2s; }
     .toggle.on { background: var(--blue); }
     .toggle.on::after { transform: translateX(20px); }
     
-    /* ═══ MENU ═══ */
-    .menu-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(26, 43, 74, 0.5);
-      backdrop-filter: blur(4px);
-      z-index: 100;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.3s;
-    }
+    .menu-overlay { position: fixed; inset: 0; background: rgba(26, 43, 74, 0.5); backdrop-filter: blur(4px); z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
     .menu-overlay.open { opacity: 1; pointer-events: auto; }
-    .menu-panel {
-      position: fixed;
-      top: 0; right: 0; bottom: 0;
-      width: 300px; max-width: 85vw;
-      background: linear-gradient(160deg, #4A90E2 0%, #2C6BB5 100%);
-      z-index: 101;
-      transform: translateX(100%);
-      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      overflow-y: auto;
-      color: #FFF;
-    }
+    .menu-panel { position: fixed; top: 0; right: 0; bottom: 0; width: 300px; max-width: 85vw; background: linear-gradient(160deg, #4A90E2 0%, #2C6BB5 100%); z-index: 101; transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); overflow-y: auto; color: #FFF; }
     .menu-panel.open { transform: translateX(0); }
-    .menu-header {
-      padding: 28px 22px;
-      border-bottom: 1px solid rgba(255,255,255,0.15);
-      display: flex;
-      align-items: center;
-      gap: 14px;
-    }
-    .menu-avatar {
-      width: 52px; height: 52px;
-      border-radius: 18px;
-      background: rgba(255,255,255,0.2);
-      backdrop-filter: blur(10px);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 22px;
-      border: 1.5px solid rgba(255,255,255,0.3);
-    }
+    .menu-header { padding: 28px 22px; border-bottom: 1px solid rgba(255,255,255,0.15); display: flex; align-items: center; gap: 14px; }
+    .menu-avatar { width: 52px; height: 52px; border-radius: 18px; background: rgba(255,255,255,0.2); backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: center; font-size: 22px; border: 1.5px solid rgba(255,255,255,0.3); }
     .menu-user { font-size: 17px; font-weight: 700; letter-spacing: -0.2px; }
     .menu-role { font-size: 12px; font-weight: 500; opacity: 0.75; margin-top: 2px; }
     .menu-list { padding: 10px 0; }
-    .menu-item {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      padding: 18px 22px;
-      font-size: 15px;
-      font-weight: 600;
-      cursor: pointer;
-      border: none;
-      background: transparent;
-      color: #FFF;
-      width: 100%;
-      text-align: left;
-      transition: background 0.2s;
-    }
+    .menu-item { display: flex; align-items: center; gap: 16px; padding: 18px 22px; font-size: 15px; font-weight: 600; cursor: pointer; border: none; background: transparent; color: #FFF; width: 100%; text-align: left; transition: background 0.2s; }
     .menu-item:active { background: rgba(255,255,255,0.1); }
     .menu-item-icon { font-size: 20px; width: 24px; text-align: center; }
-    .menu-item-badge {
-      margin-left: auto;
-      background: var(--danger);
-      color: #FFF;
-      font-size: 11px; font-weight: 800;
-      padding: 3px 10px;
-      border-radius: 999px;
-    }
-    .menu-footer {
-      padding: 22px;
-      border-top: 1px solid rgba(255,255,255,0.15);
-      font-size: 13px;
-      font-weight: 500;
-      opacity: 0.75;
-      line-height: 1.5;
-    }
+    .menu-footer { padding: 22px; border-top: 1px solid rgba(255,255,255,0.15); font-size: 13px; font-weight: 500; opacity: 0.75; line-height: 1.5; }
     
-    /* ═══ BOTTOM NAV ═══ */
-    .bottom-nav {
-      position: fixed;
-      bottom: 16px;
-      left: 16px;
-      right: 16px;
-      background: rgba(255,255,255,0.92);
-      backdrop-filter: blur(20px);
-      border-radius: 24px;
-      display: flex;
-      justify-content: space-around;
-      padding: 10px 8px;
-      z-index: 50;
-      max-width: 568px;
-      margin: 0 auto;
-      box-shadow: 0 12px 40px rgba(26, 43, 74, 0.15);
-      border: 1px solid rgba(255,255,255,0.5);
-    }
-    .nav-item {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 4px;
-      padding: 10px 4px;
-      background: none;
-      border: none;
-      cursor: pointer;
-      color: var(--text-muted);
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 0.3px;
-      transition: all 0.2s;
-      border-radius: 16px;
-    }
+    .bottom-nav { position: fixed; bottom: 16px; left: 16px; right: 16px; background: rgba(255,255,255,0.92); backdrop-filter: blur(20px); border-radius: 24px; display: flex; justify-content: space-around; padding: 10px 8px; z-index: 50; max-width: 568px; margin: 0 auto; box-shadow: 0 12px 40px rgba(26, 43, 74, 0.15); border: 1px solid rgba(255,255,255,0.5); }
+    .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 4px; background: none; border: none; cursor: pointer; color: var(--text-muted); font-size: 10px; font-weight: 700; letter-spacing: 0.3px; transition: all 0.2s; border-radius: 16px; }
     .nav-item.active { color: var(--blue); background: var(--blue-soft); }
     .nav-icon { font-size: 22px; }
     
-    /* ═══ SCREENS ═══ */
     .screen { display: none; animation: fadeIn 0.3s; }
     .screen.active { display: block; }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(8px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
     .role-master, .role-client { display: none; }
     .role-master.active, .role-client.active { display: block; }
     
-    /* ═══ MODAL ═══ */
-    .modal-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(26, 43, 74, 0.5);
-      backdrop-filter: blur(4px);
-      z-index: 300;
-      display: none;
-      align-items: flex-end;
-      justify-content: center;
-    }
+    .modal-overlay { position: fixed; inset: 0; background: rgba(26, 43, 74, 0.5); backdrop-filter: blur(4px); z-index: 300; display: none; align-items: flex-end; justify-content: center; }
     .modal-overlay.open { display: flex; }
-    .modal {
-      background: #FFF;
-      border-radius: 32px 32px 0 0;
-      padding: 28px 22px;
-      width: 100%;
-      max-width: 600px;
-      max-height: 90vh;
-      overflow-y: auto;
-      animation: slideUp 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    @keyframes slideUp {
-      from { transform: translateY(100%); }
-      to { transform: translateY(0); }
-    }
-    .modal-handle {
-      width: 44px; height: 4px;
-      background: var(--border);
-      border-radius: 2px;
-      margin: 0 auto 24px;
-    }
-    .modal-title {
-      font-size: 22px; font-weight: 800;
-      color: var(--text);
-      margin-bottom: 24px;
-      text-align: center;
-      letter-spacing: -0.5px;
-    }
+    .modal { background: #FFF; border-radius: 32px 32px 0 0; padding: 28px 22px; width: 100%; max-width: 600px; max-height: 90vh; overflow-y: auto; animation: slideUp 0.35s cubic-bezier(0.4, 0, 0.2, 1); }
+    @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+    .modal-handle { width: 44px; height: 4px; background: var(--border); border-radius: 2px; margin: 0 auto 24px; }
+    .modal-title { font-size: 22px; font-weight: 800; color: var(--text); margin-bottom: 24px; text-align: center; letter-spacing: -0.5px; }
   </style>
-</head>
-<body>
+</head><body>
 
-  <div class="demo-switch">
-    <span class="demo-label">Демо</span>
-    <button class="demo-btn active" id="btnMaster" onclick="switchRole('master')">Мастер</button>
-    <button class="demo-btn" id="btnClient" onclick="switchRole('client')">Клиент</button>
-  </div>
-
-  <!-- ═══════════════════════════════════════════
-       РОЛЬ: МАСТЕР
-       ═══════════════════════════════════════════ -->
-  <div class="role-master active" id="roleMaster">
+  <!-- РОЛЬ: МАСТЕР -->
+  <div class="role-master" id="roleMaster">
     
     <!-- ГЛАВНАЯ -->
     <div class="screen active" id="screenHome">
@@ -1631,16 +376,13 @@
           </div>
           <button class="header-menu" onclick="toggleMenu()">☰</button>
         </div>
-        
-        <div class="header-date" id="homeDate">24 сентября</div>
-        <div class="header-date-sub" id="homeDay">Четверг</div>
-        
+        <div class="header-date" id="homeDate">—</div>
+        <div class="header-date-sub" id="homeDay">—</div>
         <div class="header-actions">
           <button class="btn-glass" onclick="showScreen('windows')">📅 Окна</button>
           <button class="btn-glass" onclick="showScreen('reminders')">🔔 Напоминания</button>
         </div>
       </div>
-      
       <div class="floating-stats">
         <div class="stat-block">
           <div class="stat-value" id="homeTodayCount">0</div>
@@ -1651,9 +393,7 @@
           <div class="stat-label">выручка<br>за день</div>
         </div>
       </div>
-      
       <div class="content">
-        
         <div class="card">
           <div class="card-row">
             <div class="card-icon icon-money">💰</div>
@@ -1664,13 +404,10 @@
             <button class="btn-green" onclick="showScreen('finance')">финансы</button>
           </div>
         </div>
-        
         <div class="section-label">Ближайшие визиты</div>
         <div class="card" id="homeUpcoming"></div>
-        
         <div class="section-label">Записи на неделе</div>
         <div class="card" id="homeWeekTable"></div>
-        
       </div>
     </div>
     
@@ -1681,53 +418,39 @@
           <button class="header-menu" onclick="showScreen('home')">←</button>
           <div style="flex:1; margin-left:14px;">
             <div class="header-title">Окна</div>
-            <div class="header-subtitle" id="headerSubtitle">24 сентября</div>
+            <div class="header-subtitle" id="headerSubtitle">—</div>
           </div>
           <button class="header-menu" onclick="openAddWindow()">+</button>
         </div>
       </div>
-      
       <div class="content">
         <div class="view-toggle">
           <button class="view-toggle-btn active" id="btnViewDay" onclick="switchView('day')">День</button>
           <button class="view-toggle-btn" id="btnViewMonth" onclick="switchView('month')">Месяц</button>
         </div>
-        
         <div id="viewDay">
           <div class="date-nav">
             <button class="date-nav-btn" onclick="prevDay()">←</button>
-            <div class="date-nav-center" id="currentDate">24 сентября</div>
+            <div class="date-nav-center" id="currentDate">—</div>
             <button class="date-nav-btn" onclick="nextDay()">→</button>
           </div>
-          <div class="date-nav-sub" id="currentDayOfWeek">Четверг · Сегодня</div>
-          
+          <div class="date-nav-sub" id="currentDayOfWeek">—</div>
           <div class="section-label">Окна на день</div>
           <div id="windowsList"></div>
-          
           <div style="margin-top: 20px;">
-            <button class="btn-primary" style="margin-bottom: 12px;" onclick="openGenerateMonth()">
-              🚀 Сгенерировать месяц
-            </button>
-            <button class="btn-danger" onclick="makeDayOff()">
-              🚫 Сделать выходным
-            </button>
+            <button class="btn-primary" style="margin-bottom: 12px;" onclick="openGenerateMonth()">🚀 Сгенерировать месяц</button>
+            <button class="btn-danger" onclick="makeDayOff()">🚫 Сделать выходным</button>
           </div>
         </div>
-        
         <div id="viewMonth" style="display: none;">
           <div class="date-nav">
             <button class="date-nav-btn" onclick="prevMonth()">←</button>
-            <div class="date-nav-center" id="currentMonth">Сентябрь 2026</div>
+            <div class="date-nav-center" id="currentMonth">—</div>
             <button class="date-nav-btn" onclick="nextMonth()">→</button>
           </div>
           <div class="month-grid">
             <div class="month-grid-header">
-              <div></div>
-              <div>11</div>
-              <div>13</div>
-              <div>15</div>
-              <div>17</div>
-              <div>19</div>
+              <div></div><div>11</div><div>13</div><div>15</div><div>17</div><div>19</div>
             </div>
             <div id="monthBody"></div>
           </div>
@@ -1746,7 +469,6 @@
           </div>
         </div>
       </div>
-      
       <div class="content">
         <div class="reminder-stats">
           <div class="reminder-stat-card">
@@ -1758,9 +480,7 @@
             <div class="reminder-stat-label">Уйдёт сегодня</div>
           </div>
         </div>
-        
         <div id="remindersContent"></div>
-        
         <div style="text-align: center; font-size: 12px; color: var(--text-muted); font-weight: 500; margin-top: 24px; padding: 0 20px; line-height: 1.6;">
           💡 Напоминания уходят автоматически за 24 часа до визита
         </div>
@@ -1778,12 +498,9 @@
           </div>
         </div>
       </div>
-      
       <div class="content">
         <div id="servicesList"></div>
-        <button class="add-service-btn" onclick="openAddService()">
-          ➕ Добавить услугу
-        </button>
+        <button class="add-service-btn" onclick="openAddService()">➕ Добавить услугу</button>
       </div>
     </div>
     
@@ -1794,19 +511,17 @@
           <button class="header-menu" onclick="showScreen('home')">←</button>
           <div style="flex:1; margin-left:14px;">
             <div class="header-title">Финансы</div>
-            <div class="header-subtitle" id="financeSubtitle">Сентябрь 2026</div>
+            <div class="header-subtitle" id="financeSubtitle">—</div>
           </div>
           <button class="header-menu" onclick="openAddExpense()">+</button>
         </div>
       </div>
-      
       <div class="content">
         <div class="period-nav">
           <button class="period-btn active" onclick="setFinancePeriod('month', this)">Месяц</button>
           <button class="period-btn" onclick="setFinancePeriod('week', this)">Неделя</button>
           <button class="period-btn" onclick="setFinancePeriod('all', this)">Всё</button>
         </div>
-        
         <div class="finance-hero">
           <div class="finance-hero-label">Прибыль за период</div>
           <div class="finance-hero-value" id="financeTotal">0 Br</div>
@@ -1821,7 +536,6 @@
             </div>
           </div>
         </div>
-        
         <div class="finance-grid">
           <div class="finance-tile">
             <div class="finance-tile-icon">📊</div>
@@ -1844,12 +558,10 @@
             <div class="finance-tile-value blue" id="tileProfit">0 Br</div>
           </div>
         </div>
-        
         <div class="chart-container">
           <div class="chart-title">📈 Доход по дням</div>
           <div class="chart-bars" id="chartBars"></div>
         </div>
-        
         <div class="chart-container">
           <div class="chart-title" style="display: flex; justify-content: space-between; align-items: center;">
             <span>📋 История</span>
@@ -1871,48 +583,44 @@
           </div>
         </div>
       </div>
-      
       <div class="content">
         <div class="profile-avatar-wrap">
           <div class="profile-avatar" id="profileAvatarPreview">💅</div>
           <button class="profile-avatar-btn" onclick="changeAvatar()">📷 Изменить фото</button>
         </div>
-        
         <div class="card">
           <div class="form-group">
             <label class="form-label">Имя</label>
-            <input type="text" class="form-input" id="profileName" value="Елизавета Остапенко">
+            <input type="text" class="form-input" id="profileName" placeholder="Имя">
           </div>
           <div class="form-group">
             <label class="form-label">Студия</label>
-            <input type="text" class="form-input" id="profileStudio" value="Linail Brest">
+            <input type="text" class="form-input" id="profileStudio" placeholder="Студия">
           </div>
           <div class="form-group" style="margin-bottom:0;">
             <label class="form-label">Описание</label>
-            <textarea class="form-input form-textarea" id="profileDesc">Мастер маникюра с опытом 5 лет</textarea>
+            <textarea class="form-input form-textarea" id="profileDesc" placeholder="Описание"></textarea>
           </div>
         </div>
-        
         <div class="section-label">Контакты</div>
         <div class="card">
           <div class="form-group">
             <label class="form-label">📞 Телефон</label>
-            <input type="tel" class="form-input" id="profilePhone" value="+375 (33) 991-20-34">
+            <input type="tel" class="form-input" id="profilePhone" placeholder="+375...">
           </div>
           <div class="form-group">
             <label class="form-label">✈️ Telegram</label>
-            <input type="text" class="form-input" id="profileTg" value="@llwnqk">
+            <input type="text" class="form-input" id="profileTg" placeholder="@username">
           </div>
           <div class="form-group">
             <label class="form-label">📷 Instagram</label>
-            <input type="text" class="form-input" id="profileInst" value="@linail_brest">
+            <input type="text" class="form-input" id="profileInst" placeholder="@username">
           </div>
           <div class="form-group" style="margin-bottom:0;">
             <label class="form-label">📍 Адрес</label>
-            <input type="text" class="form-input" id="profileAddress" value="ул. Буденного, 28, 3 этаж, Брест">
+            <input type="text" class="form-input" id="profileAddress" placeholder="Адрес">
           </div>
         </div>
-        
         <button class="btn-primary" style="margin-top: 24px;" onclick="saveProfile()">✅ Сохранить</button>
       </div>
     </div>
@@ -1929,20 +637,17 @@
           <button class="header-menu" onclick="openAddClient()">+</button>
         </div>
       </div>
-      
       <div class="content">
         <div class="search-bar">
           <span class="search-icon">🔍</span>
           <input type="text" class="search-input" id="clientSearch" placeholder="Поиск по имени или телефону" oninput="filterClients()">
         </div>
-        
         <div class="client-filters">
           <button class="filter-chip active" onclick="setClientFilter('all', this)">Все</button>
           <button class="filter-chip" onclick="setClientFilter('new', this)">Новые</button>
           <button class="filter-chip" onclick="setClientFilter('sleeping', this)">Спящие</button>
           <button class="filter-chip" onclick="setClientFilter('no-tg', this)">Без Telegram</button>
         </div>
-        
         <div id="clientsList"></div>
       </div>
     </div>
@@ -1959,31 +664,25 @@
           <button class="header-menu" onclick="openEditClient()">✏️</button>
         </div>
       </div>
-      
       <div class="content">
         <div class="card card-elevated">
           <div class="client-profile-header">
-            <div class="client-profile-avatar" id="clientProfileAvatar">К</div>
-            <div class="client-profile-name" id="clientProfileName">Катя</div>
-            <div class="client-profile-tag" id="clientProfileTag">Постоянный</div>
+            <div class="client-profile-avatar" id="clientProfileAvatar">—</div>
+            <div class="client-profile-name" id="clientProfileName">—</div>
+            <div class="client-profile-tag" id="clientProfileTag">—</div>
           </div>
-          
           <div class="client-action-buttons">
             <button class="client-action-btn secondary" onclick="callClient()">
-              <span class="client-action-btn-icon">📞</span>
-              Позвонить
+              <span class="client-action-btn-icon">📞</span>Позвонить
             </button>
             <button class="client-action-btn secondary" onclick="writeClient()">
-              <span class="client-action-btn-icon">✈️</span>
-              Написать
+              <span class="client-action-btn-icon">✈️</span>Написать
             </button>
             <button class="client-action-btn primary" onclick="openAddVisit()">
-              <span class="client-action-btn-icon">➕</span>
-              Визит
+              <span class="client-action-btn-icon">➕</span>Визит
             </button>
           </div>
         </div>
-        
         <div class="section-label">Контакты</div>
         <div class="card">
           <div class="info-row">
@@ -2002,7 +701,6 @@
             <div class="info-value" id="clientProfileInst">—</div>
           </div>
         </div>
-        
         <div class="section-label">Статистика</div>
         <div class="finance-grid">
           <div class="finance-tile">
@@ -2016,13 +714,11 @@
             <div class="finance-tile-value income" id="clientStatSpent">0 Br</div>
           </div>
         </div>
-        
         <div class="section-label">Заметки</div>
         <div class="card">
-          <textarea class="form-input form-textarea" id="clientProfileNotes" placeholder="Заметки о клиенте..."></textarea>
+          <textarea class="form-input form-textarea" id="clientProfileNotes" placeholder="Заметки..."></textarea>
           <button class="btn-primary" style="margin-top: 14px; font-size: 15px; padding: 14px;" onclick="saveClientNotes()">💾 Сохранить</button>
         </div>
-        
         <div class="section-label">История визитов</div>
         <div class="card" id="clientVisitsList"></div>
       </div>
@@ -2035,13 +731,11 @@
           <button class="header-menu" onclick="showScreen('home')">←</button>
           <div style="flex:1; margin-left:14px;">
             <div class="header-title">Настройки</div>
-            <div class="header-subtitle">Параметры приложения</div>
+            <div class="header-subtitle">Параметры</div>
           </div>
         </div>
       </div>
-      
       <div class="content">
-        
         <div class="section-label">Уведомления</div>
         <div class="card">
           <div class="setting-item">
@@ -2052,129 +746,60 @@
             </div>
             <div class="toggle on" onclick="toggleSetting(this)"></div>
           </div>
-          
-          <div class="setting-item">
-            <div class="setting-icon">📩</div>
-            <div class="setting-content">
-              <div class="setting-title">Уведомления о записях</div>
-              <div class="setting-desc">Когда клиент записывается сам</div>
-            </div>
-            <div class="toggle on" onclick="toggleSetting(this)"></div>
-          </div>
         </div>
-        
-        <div class="section-label">Работа</div>
-        <div class="card">
-          <div class="setting-item">
-            <div class="setting-icon">⏱</div>
-            <div class="setting-content">
-              <div class="setting-title">Длительность окна</div>
-              <div class="setting-desc">2 часа по умолчанию</div>
-            </div>
-            <button style="background: var(--blue-light); color: var(--blue); font-size: 13px; font-weight: 700; padding: 8px 16px; border-radius: 999px; border: none; cursor: pointer;">2ч</button>
-          </div>
-          
-          <div class="setting-item">
-            <div class="setting-icon">🚀</div>
-            <div class="setting-content">
-              <div class="setting-title">Автогенерация месяца</div>
-              <div class="setting-desc">1-го числа создавать окна автоматически</div>
-            </div>
-            <div class="toggle" onclick="toggleSetting(this)"></div>
-          </div>
-        </div>
-        
-        <div class="section-label">Ссылки</div>
-        <div class="card">
-          <div class="setting-item" onclick="copyLink('bot')" style="cursor:pointer;">
-            <div class="setting-icon">🤖</div>
-            <div class="setting-content">
-              <div class="setting-title">Ссылка на бота</div>
-              <div class="setting-desc">Отправьте клиентам, чтобы они записались</div>
-            </div>
-            <span style="font-size: 18px; opacity: 0.4;">→</span>
-          </div>
-          
-          <div class="setting-item" onclick="copyLink('app')" style="cursor:pointer;">
-            <div class="setting-icon">🔗</div>
-            <div class="setting-content">
-              <div class="setting-title">Ссылка на приложение</div>
-              <div class="setting-desc">Поделиться с клиентами</div>
-            </div>
-            <span style="font-size: 18px; opacity: 0.4;">→</span>
-          </div>
-        </div>
-        
         <div class="section-label">Опасная зона</div>
         <div class="card">
           <button class="btn-danger" onclick="resetData()">🗑 Сбросить все данные</button>
         </div>
-        
         <div style="text-align: center; font-size: 12px; color: var(--text-muted); font-weight: 500; margin-top: 24px; line-height: 1.5;">
           Linail Brest Mini App<br>v1.0
         </div>
-        
       </div>
     </div>
     
-    <!-- BOTTOM NAV -->
     <div class="bottom-nav">
       <button class="nav-item active" onclick="showScreen('home')">
-        <span class="nav-icon">🏠</span>
-        <span>Главная</span>
+        <span class="nav-icon">🏠</span><span>Главная</span>
       </button>
       <button class="nav-item" onclick="showScreen('windows')">
-        <span class="nav-icon">📅</span>
-        <span>Окна</span>
+        <span class="nav-icon">📅</span><span>Окна</span>
       </button>
       <button class="nav-item" onclick="showScreen('clients')">
-        <span class="nav-icon">👥</span>
-        <span>Клиенты</span>
+        <span class="nav-icon">👥</span><span>Клиенты</span>
       </button>
       <button class="nav-item" onclick="showScreen('finance')">
-        <span class="nav-icon">💰</span>
-        <span>Финансы</span>
+        <span class="nav-icon">💰</span><span>Финансы</span>
       </button>
     </div>
-    
   </div>
-
-  <!-- ═══════════════════════════════════════════
-       РОЛЬ: КЛИЕНТ
-       ═══════════════════════════════════════════ -->
+  
+  <!-- РОЛЬ: КЛИЕНТ -->
   <div class="role-client" id="roleClient">
     <div class="client-header">
       <div class="client-avatar">💅</div>
-      <div class="client-name" id="clientNameView">Елизавета Остапенко</div>
-      <div class="client-studio" id="clientStudioView">Linail Brest</div>
+      <div class="client-name" id="clientNameView">—</div>
+      <div class="client-studio" id="clientStudioView">—</div>
     </div>
-    
     <div class="content" style="padding-top: 0;">
       <div class="card card-elevated" style="margin-top: -40px; position: relative; z-index: 5;">
-        <div class="contact-row"><div class="contact-icon">📍</div><div class="contact-text" id="clientAddressView">ул. Буденного, 28, 3 этаж</div></div>
-        <div class="contact-row"><div class="contact-icon">📞</div><div class="contact-text" id="clientPhoneView">+375 (33) 991-20-34</div></div>
-        <div class="contact-row"><div class="contact-icon">✈️</div><div class="contact-text" id="clientTgView">@llwnqk</div></div>
-        <div class="contact-row"><div class="contact-icon">📷</div><div class="contact-text" id="clientInstView">@linail_brest</div></div>
+        <div class="contact-row"><div class="contact-icon">📍</div><div class="contact-text" id="clientAddressView">—</div></div>
+        <div class="contact-row"><div class="contact-icon">📞</div><div class="contact-text" id="clientPhoneView">—</div></div>
+        <div class="contact-row"><div class="contact-icon">✈️</div><div class="contact-text" id="clientTgView">—</div></div>
+        <div class="contact-row"><div class="contact-icon">📷</div><div class="contact-text" id="clientInstView">—</div></div>
       </div>
-      
-      <button class="btn-primary" style="margin: 20px 0;" onclick="openBookingModal()">
-        📅 Записаться
-      </button>
-      
+      <button class="btn-primary" style="margin: 20px 0;" onclick="openBookingModal()">📅 Записаться</button>
       <div class="section-label">Мои записи</div>
       <div id="myBookingsList"></div>
-      
       <div class="section-label">Прайс-лист</div>
       <div class="card" id="clientPriceList"></div>
     </div>
-    
     <div class="bottom-nav">
       <button class="nav-item active"><span class="nav-icon">🏠</span><span>Главная</span></button>
       <button class="nav-item" onclick="openBookingModal()"><span class="nav-icon">📅</span><span>Записаться</span></button>
     </div>
   </div>
-
-  <!-- MENU -->
+  
+  <!-- МЕНЮ -->
   <div class="menu-overlay" id="menuOverlay" onclick="toggleMenu()"></div>
   <div class="menu-panel" id="menuPanel">
     <div class="menu-header">
@@ -2195,8 +820,8 @@
       <div>Напишите нам в Telegram</div>
     </div>
   </div>
-
-  <!-- MODALS -->
+  
+  <!-- МОДАЛКИ -->
   <div class="modal-overlay" id="modalAddWindow">
     <div class="modal">
       <div class="modal-handle"></div>
@@ -2212,7 +837,7 @@
       <button class="btn-primary" onclick="addWindow()">✅ Добавить</button>
     </div>
   </div>
-
+  
   <div class="modal-overlay" id="modalGenerateMonth">
     <div class="modal">
       <div class="modal-handle"></div>
@@ -2224,7 +849,7 @@
       <button class="btn-primary" style="margin-top: 20px;" onclick="generateMonth()">🚀 Сгенерировать</button>
     </div>
   </div>
-
+  
   <div class="modal-overlay" id="modalService">
     <div class="modal">
       <div class="modal-handle"></div>
@@ -2249,7 +874,7 @@
       <button class="btn-danger" id="deleteServiceBtn" onclick="deleteServiceFromModal()" style="display: none;">🗑 Удалить</button>
     </div>
   </div>
-
+  
   <div class="modal-overlay" id="modalExpense">
     <div class="modal">
       <div class="modal-handle"></div>
@@ -2257,26 +882,11 @@
       <div class="form-group">
         <label class="form-label">Категория</label>
         <div id="expenseCategories">
-          <div class="expense-category selected" data-cat="Материалы">
-            <div class="expense-category-icon">💅</div>
-            <div class="expense-category-name">Материалы</div>
-          </div>
-          <div class="expense-category" data-cat="Аренда">
-            <div class="expense-category-icon">🏠</div>
-            <div class="expense-category-name">Аренда</div>
-          </div>
-          <div class="expense-category" data-cat="Реклама">
-            <div class="expense-category-icon">📢</div>
-            <div class="expense-category-name">Реклама</div>
-          </div>
-          <div class="expense-category" data-cat="Обучение">
-            <div class="expense-category-icon">📚</div>
-            <div class="expense-category-name">Обучение</div>
-          </div>
-          <div class="expense-category" data-cat="Прочее">
-            <div class="expense-category-icon">📦</div>
-            <div class="expense-category-name">Прочее</div>
-          </div>
+          <div class="expense-category selected" data-cat="Материалы"><div class="expense-category-icon">💅</div><div class="expense-category-name">Материалы</div></div>
+          <div class="expense-category" data-cat="Аренда"><div class="expense-category-icon">🏠</div><div class="expense-category-name">Аренда</div></div>
+          <div class="expense-category" data-cat="Реклама"><div class="expense-category-icon">📢</div><div class="expense-category-name">Реклама</div></div>
+          <div class="expense-category" data-cat="Обучение"><div class="expense-category-icon">📚</div><div class="expense-category-name">Обучение</div></div>
+          <div class="expense-category" data-cat="Прочее"><div class="expense-category-icon">📦</div><div class="expense-category-name">Прочее</div></div>
         </div>
       </div>
       <div class="form-group">
@@ -2289,12 +899,12 @@
       </div>
       <div class="form-group">
         <label class="form-label">Комментарий</label>
-        <input type="text" class="form-input" id="expenseComment" placeholder="Например: гель-лак">
+        <input type="text" class="form-input" id="expenseComment" placeholder="Комментарий">
       </div>
       <button class="btn-primary" onclick="saveExpense()">✅ Сохранить</button>
     </div>
   </div>
-
+  
   <div class="modal-overlay" id="modalBooking">
     <div class="modal">
       <div class="modal-handle"></div>
@@ -2325,22 +935,22 @@
       </div>
     </div>
   </div>
-
+  
   <div class="modal-overlay" id="modalClient">
     <div class="modal">
       <div class="modal-handle"></div>
       <div class="modal-title" id="modalClientTitle">Новый клиент</div>
       <div class="form-group">
         <label class="form-label">Имя</label>
-        <input type="text" class="form-input" id="clientNameInput" placeholder="Катя">
+        <input type="text" class="form-input" id="clientNameInput" placeholder="Имя">
       </div>
       <div class="form-group">
         <label class="form-label">Телефон</label>
-        <input type="tel" class="form-input" id="clientPhoneInput" placeholder="+375 (33) 123-45-67">
+        <input type="tel" class="form-input" id="clientPhoneInput" placeholder="+375...">
       </div>
       <div class="form-group">
         <label class="form-label">Telegram</label>
-        <input type="text" class="form-input" id="clientTgInput" placeholder="@username (необязательно)">
+        <input type="text" class="form-input" id="clientTgInput" placeholder="@username">
       </div>
       <div class="form-group">
         <label class="form-label">Заметки</label>
@@ -2350,12 +960,11 @@
       <button class="btn-danger" id="deleteClientBtn" onclick="deleteClientFromModal()" style="display: none;">🗑 Удалить</button>
     </div>
   </div>
-
+  
   <div class="modal-overlay" id="modalVisit">
     <div class="modal">
       <div class="modal-handle"></div>
       <div class="modal-title">Добавить визит</div>
-      
       <div class="form-group">
         <label class="form-label">Услуга</label>
         <select class="form-input" id="visitService" style="cursor: pointer;"></select>
@@ -2372,27 +981,25 @@
         <label class="form-label">Сумма (Br)</label>
         <input type="number" class="form-input" id="visitAmount" placeholder="55" min="0">
       </div>
-      
       <div style="background: var(--blue-light); border-radius: 16px; padding: 14px; margin-bottom: 20px; font-size: 13px; font-weight: 500; color: var(--blue); line-height: 1.5;">
         💡 Сумма попадёт в финансы, когда время визита пройдёт.
       </div>
-      
       <button class="btn-primary" onclick="saveVisit()">✅ Добавить визит</button>
     </div>
-  </div>
-
-  <script>
+  </div>  <script>
     // ═══════════════════════════════════════════
     // LINAIL BREST — Mini App с API
     // ═══════════════════════════════════════════
 
     const API_URL = 'https://linail-api.yanlevot6.workers.dev/api';
+    const OWNER_ID = 705780209;
 
     let services = [];
     let clients = [];
     let expenses = [];
     let masterProfile = {};
 
+    // ═══ API ═══
     async function apiGet(action, payload) {
       try {
         let url = API_URL + '?action=' + encodeURIComponent(action);
@@ -2400,62 +1007,42 @@
         const res = await fetch(url);
         return await res.json();
       } catch (err) {
-        console.error('API error:', err.stack);
+        console.error('API error:', err, err.stack);
         return { ok: false, error: err.message };
       }
     }
-
-    async function apiSave(action, payload) {
-      return apiGet(action, payload);
-    }
+    async function apiSave(action, payload) { return apiGet(action, payload); }
 
     async function loadAllData() {
       const data = await apiGet('getAll');
-
       if (data.ok) {
         services = (data.services || []).map(s => ({
-          id: parseInt(s.ID),
-          name: s['Название'],
-          price: parseFloat(s['Цена']),
-          duration: parseInt(s['Длительность']),
-          desc: s['Описание'] || '',
+          id: parseInt(s.ID), name: s['Название'], price: parseFloat(s['Цена']),
+          duration: parseInt(s['Длительность']), desc: s['Описание'] || '',
           active: s['Активна'] === true || s['Активна'] === 'TRUE'
         }));
-
         clients = (data.clients || []).map(c => ({
-          id: parseInt(c.ID),
-          name: c['Имя'],
-          phone: c['Телефон'] || '',
-          tg: c['Telegram'] || '',
-          inst: c['Instagram'] || '',
+          id: parseInt(c.ID), name: c['Имя'], phone: c['Телефон'] || '',
+          tg: c['Telegram'] || '', inst: c['Instagram'] || '',
           notes: c['Заметки'] || '',
           telegramId: c['TelegramID'] ? parseInt(c['TelegramID']) : null,
-          createdAt: c['Дата создания'] || '',
-          visits: []
+          createdAt: c['Дата создания'] || '', visits: []
         }));
-
         (data.visits || []).forEach(v => {
           const client = clients.find(c => c.id === parseInt(v['КлиентID']));
           if (client) {
             client.visits.push({
-              id: parseInt(v.ID),
-              date: v['Дата'],
-              time: v['Время'],
-              service: v['Услуга'],
-              amount: parseFloat(v['Сумма']),
+              id: parseInt(v.ID), date: v['Дата'], time: v['Время'],
+              service: v['Услуга'], amount: parseFloat(v['Сумма']),
               telegramId: v['TelegramID'] ? parseInt(v['TelegramID']) : null
             });
           }
         });
-
         expenses = (data.expenses || []).map(e => ({
-          id: parseInt(e.ID),
-          category: e['Категория'],
-          amount: parseFloat(e['Сумма']),
-          date: e['Дата'],
+          id: parseInt(e.ID), category: e['Категория'],
+          amount: parseFloat(e['Сумма']), date: e['Дата'],
           comment: e['Комментарий'] || ''
         }));
-
         masterProfile = {
           name: data.settings['Имя мастера'] || 'Мастер',
           studio: data.settings['Студия'] || '',
@@ -2467,7 +1054,6 @@
           windows: data.settings['Стандартные окна'] || '11:00, 13:00, 15:00, 17:00, 19:00'
         };
       }
-
       renderAll();
     }
 
@@ -2492,6 +1078,7 @@
       document.getElementById('clientInstView').textContent = masterProfile.inst || '';
     }
 
+    // ═══ TELEGRAM ═══
     const tg = window.Telegram?.WebApp;
     if (tg) {
       tg.ready();
@@ -2499,14 +1086,18 @@
       document.querySelectorAll('button').forEach(btn => {
         btn.addEventListener('click', () => tg.HapticFeedback?.impactOccurred('light'));
       });
-    }
-
-    function switchRole(role) {
-      document.getElementById('roleMaster').classList.toggle('active', role === 'master');
-      document.getElementById('roleClient').classList.toggle('active', role === 'client');
-      document.getElementById('btnMaster').classList.toggle('active', role === 'master');
-      document.getElementById('btnClient').classList.toggle('active', role === 'client');
-      window.scrollTo(0, 0);
+      const userId = tg.initDataUnsafe?.user?.id;
+      setTimeout(() => {
+        if (userId === OWNER_ID) {
+          document.getElementById('roleMaster').classList.add('active');
+          document.getElementById('roleClient').classList.remove('active');
+        } else {
+          document.getElementById('roleMaster').classList.remove('active');
+          document.getElementById('roleClient').classList.add('active');
+        }
+      }, 100);
+    } else {
+      document.getElementById('roleMaster').classList.add('active');
     }
 
     function showScreen(name) {
@@ -2514,14 +1105,12 @@
       const el = document.getElementById('screen' + name.charAt(0).toUpperCase() + name.slice(1));
       if (el) el.classList.add('active');
       window.scrollTo(0, 0);
-
       document.querySelectorAll('#roleMaster .bottom-nav .nav-item').forEach(b => b.classList.remove('active'));
       const navMap = { home: 0, windows: 1, clients: 2, finance: 3 };
       if (navMap[name] !== undefined) {
         const navItems = document.querySelectorAll('#roleMaster .bottom-nav .nav-item');
         if (navItems[navMap[name]]) navItems[navMap[name]].classList.add('active');
       }
-
       if (name === 'home') renderHome();
       if (name === 'reminders') renderReminders();
       if (name === 'finance') renderFinance();
@@ -2533,9 +1122,17 @@
       document.getElementById('menuPanel').classList.toggle('open');
     }
 
+    function toggleSetting(el) { el.classList.toggle('on'); }
+
+    function resetData() {
+      if (confirm('Удалить ВСЕ данные? Это действие нельзя отменить.')) {
+        alert('⚠️ В реальном приложении здесь данные очистятся');
+      }
+    }
+
+    // ═══ ДАТЫ ═══
     let currentDate = new Date();
     let currentMonthDate = new Date();
-
     const MONTHS = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
     const MONTHS_GEN = ['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
     const DAYS_FULL = ['Воскресенье','Понедельник','Вторник','Среда','Четверг','Пятница','Суббота'];
@@ -2550,7 +1147,6 @@
       document.getElementById('currentDayOfWeek').textContent = DAYS_FULL[currentDate.getDay()] + (isToday ? ' · Сегодня' : '');
       document.getElementById('headerSubtitle').textContent = formatDateFull(currentDate);
     }
-
     function prevDay() { currentDate.setDate(currentDate.getDate() - 1); updateDateDisplay(); }
     function nextDay() { currentDate.setDate(currentDate.getDate() + 1); updateDateDisplay(); }
 
@@ -2569,20 +1165,17 @@
       const daysInMonth = new Date(year, month + 1, 0).getDate();
       const today = new Date(); today.setHours(0,0,0,0);
       const times = ['11:00','13:00','15:00','17:00','19:00'];
-
       for (let day = 1; day <= daysInMonth; day++) {
         const date = new Date(year, month, day);
         const dayOfWeek = date.getDay();
         const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
         const isToday = date.getTime() === today.getTime();
-
         const row = document.createElement('div');
         row.className = 'month-grid-row';
         const dayLabel = document.createElement('div');
         dayLabel.className = 'month-grid-day' + (isToday ? ' today' : '') + (isWeekend ? ' weekend' : '');
         dayLabel.textContent = day + ' ' + ['вс','пн','вт','ср','чт','пт','сб'][dayOfWeek];
         row.appendChild(dayLabel);
-
         times.forEach(time => {
           const cell = document.createElement('div');
           if (isWeekend) cell.className = 'month-grid-cell off';
@@ -2622,7 +1215,10 @@
       document.getElementById('btnViewDay').classList.toggle('active', view === 'day');
       document.getElementById('btnViewMonth').classList.toggle('active', view === 'month');
       if (view === 'month') updateMonthDisplay();
-    }    function openAddWindow() {
+    }
+
+    // ═══ МОДАЛКИ ═══
+    function openAddWindow() {
       document.getElementById('newWindowDate').value = currentDate.toISOString().split('T')[0];
       document.getElementById('modalAddWindow').classList.add('open');
     }
@@ -2701,9 +1297,7 @@
     }
     function makeDayOff() {
       if (confirm('Сделать этот день выходным?')) alert('🚫 День сделан выходным');
-    }
-
-    // ═══ УСЛУГИ ═══
+    }    // ═══ УСЛУГИ ═══
     let editingServiceId = null;
 
     function formatDuration(min) {
@@ -2781,13 +1375,9 @@
 
       const payload = {
         ID: editingServiceId,
-        'Название': name,
-        'Цена': price,
-        'Длительность': duration,
-        'Описание': desc,
-        'Активна': true
+        'Название': name, 'Цена': price,
+        'Длительность': duration, 'Описание': desc, 'Активна': true
       };
-
       const res = await apiSave('saveService', payload);
       if (res.ok) {
         if (editingServiceId) {
@@ -2985,16 +1575,10 @@
       if (!name) { alert('Введите имя'); return; }
 
       const payload = {
-        ID: editingClientId,
-        'Имя': name,
-        'Телефон': phone,
-        'Telegram': tg_,
-        'Instagram': '',
-        'Заметки': notes,
-        'TelegramID': '',
+        ID: editingClientId, 'Имя': name, 'Телефон': phone,
+        'Telegram': tg_, 'Instagram': '', 'Заметки': notes, 'TelegramID': '',
         'Дата создания': new Date().toISOString().split('T')[0]
       };
-
       const res = await apiSave('saveClient', payload);
       if (res.ok) {
         if (editingClientId) {
@@ -3004,8 +1588,7 @@
           clients.push({
             id: res.id || Math.max(...clients.map(c => c.id), 0) + 1,
             name, phone, tg: tg_, inst: '', notes, telegramId: null,
-            createdAt: new Date().toISOString().split('T')[0],
-            visits: []
+            createdAt: new Date().toISOString().split('T')[0], visits: []
           });
         }
         renderClients();
@@ -3039,30 +1622,25 @@
       if (!amount || amount <= 0) { alert('Введите сумму'); return; }
 
       const payload = {
-        'КлиентID': c.id,
-        'Клиент': c.name,
-        'Услуга': opt.dataset.name,
-        'Дата': date,
-        'Время': time,
-        'Сумма': amount,
+        'КлиентID': c.id, 'Клиент': c.name, 'Услуга': opt.dataset.name,
+        'Дата': date, 'Время': time, 'Сумма': amount,
         'TelegramID': c.telegramId || '',
         'Создано': new Date().toISOString()
       };
-
       const res = await apiSave('saveVisit', payload);
       if (res.ok) {
         c.visits.unshift({
-          id: res.id,
-          date, time,
-          service: opt.dataset.name,
-          amount,
+          id: res.id, date, time,
+          service: opt.dataset.name, amount,
           telegramId: c.telegramId
         });
         renderClients();
         openClientProfile(c.id);
         document.getElementById('modalVisit').classList.remove('open');
       } else alert('Ошибка: ' + (res.error || 'неизвестно'));
-    }    // ═══ ФИНАНСЫ ═══
+    }
+
+    // ═══ ФИНАНСЫ ═══
     let financePeriod = 'month';
 
     function setFinancePeriod(period, btn) {
@@ -3104,7 +1682,6 @@
       const allVisits = getAllVisits();
       const factVisits = allVisits.filter(v => isVisitPassed(v));
       const futureVisits = allVisits.filter(v => !isVisitPassed(v));
-
       const factInPeriod = filterByPeriod(factVisits, 'date');
       const futureInPeriod = filterByPeriod(futureVisits, 'date');
       const expensesInPeriod = filterByPeriod(expenses, 'date');
@@ -3162,7 +1739,6 @@
       const container = document.getElementById('transactionsList');
       if (!container) return;
       container.innerHTML = '';
-
       const items = [
         ...visits.map(v => ({
           type: 'income',
@@ -3184,7 +1760,6 @@
         container.innerHTML = '<div class="empty-finance"><div class="empty-finance-icon">📋</div><div class="empty-finance-text">Пока нет операций</div></div>';
         return;
       }
-
       items.forEach(t => {
         const item = document.createElement('div');
         item.className = 'transaction-item';
@@ -3215,12 +1790,9 @@
       if (!date) { alert('Выберите дату'); return; }
 
       const payload = {
-        'Категория': category,
-        'Сумма': amount,
-        'Дата': date,
-        'Комментарий': comment
+        'Категория': category, 'Сумма': amount,
+        'Дата': date, 'Комментарий': comment
       };
-
       const res = await apiSave('saveExpense', payload);
       if (res.ok) {
         expenses.push({
@@ -3283,57 +1855,45 @@
 
       if (!client) {
         const clientPayload = {
-          'Имя': name,
-          'Телефон': phone,
+          'Имя': name, 'Телефон': phone,
           'Telegram': tg?.initDataUnsafe?.user?.username ? '@' + tg.initDataUnsafe.user.username : '',
-          'Instagram': '',
-          'Заметки': '',
+          'Instagram': '', 'Заметки': '',
           'TelegramID': tgId || '',
           'Дата создания': new Date().toISOString().split('T')[0]
         };
         const clientRes = await apiSave('saveClient', clientPayload);
-        if (!clientRes.ok) { alert('Ошибка создания клиента'); return; }
-
+        if (!clientRes.ok) { alert('Ошибка создания клиента: ' + (clientRes.error || '?')); return; }
         client = {
-          id: clientRes.id,
-          name, phone,
-          tg: clientPayload['Telegram'],
-          inst: '', notes: '',
+          id: clientRes.id, name, phone,
+          tg: clientPayload['Telegram'], inst: '', notes: '',
           telegramId: tgId,
-          createdAt: clientPayload['Дата создания'],
-          visits: []
+          createdAt: clientPayload['Дата создания'], visits: []
         };
         clients.push(client);
       }
 
       const visitPayload = {
-        'КлиентID': client.id,
-        'Клиент': client.name,
+        'КлиентID': client.id, 'Клиент': client.name,
         'Услуга': selectedBookingService.name,
-        'Дата': date,
-        'Время': selectedBookingTime,
+        'Дата': date, 'Время': selectedBookingTime,
         'Сумма': selectedBookingService.price,
         'TelegramID': tgId || '',
         'Создано': new Date().toISOString()
       };
-
       const visitRes = await apiSave('saveVisit', visitPayload);
       if (visitRes.ok) {
         client.visits.unshift({
-          id: visitRes.id,
-          date, time: selectedBookingTime,
+          id: visitRes.id, date, time: selectedBookingTime,
           service: selectedBookingService.name,
-          amount: selectedBookingService.price,
-          telegramId: tgId
+          amount: selectedBookingService.price, telegramId: tgId
         });
         renderClients();
         renderFinance();
         renderMyBookings();
-
         const d = new Date(date);
         alert(`✅ Запись оформлена!\n\n${name}, ждём вас ${d.getDate()} ${MONTHS_GEN[d.getMonth()]} в ${selectedBookingTime}\n\n💅 ${selectedBookingService.name}\n💰 ${selectedBookingService.price} Br`);
         document.getElementById('modalBooking').classList.remove('open');
-      } else alert('Ошибка записи: ' + (visitRes.error || 'неизвестно'));
+      } else alert('Ошибка записи: ' + (visitRes.error || '?'));
     }
 
     document.addEventListener('click', (e) => {
@@ -3348,13 +1908,11 @@
     function renderMyBookings() {
       const container = document.getElementById('myBookingsList');
       if (!container) return;
-
       const myId = tg?.initDataUnsafe?.user?.id;
       if (!myId) {
         container.innerHTML = '<div class="card" style="text-align:center; padding: 24px; color: var(--text-muted); font-size: 14px; font-weight: 500;">Чтобы видеть свои записи, откройте через Telegram</div>';
         return;
       }
-
       const now = new Date();
       const myBookings = [];
       clients.forEach(c => {
@@ -3370,7 +1928,6 @@
         container.innerHTML = '<div class="card" style="text-align:center; padding: 24px; color: var(--text-muted); font-size: 14px; font-weight: 500;">У вас пока нет записей</div>';
         return;
       }
-
       container.innerHTML = '';
       myBookings.forEach(v => {
         const d = new Date(v.date);
@@ -3411,22 +1968,18 @@
         'Instagram': document.getElementById('profileInst').value.trim(),
         'Адрес': document.getElementById('profileAddress').value.trim()
       };
-
       const res = await apiSave('saveSettings', payload);
       if (res.ok) {
         Object.assign(masterProfile, {
-          name: payload['Имя мастера'],
-          studio: payload['Студия'],
-          desc: payload['Описание'],
-          phone: payload['Телефон'],
-          tg: payload['Telegram'],
-          inst: payload['Instagram'],
+          name: payload['Имя мастера'], studio: payload['Студия'],
+          desc: payload['Описание'], phone: payload['Телефон'],
+          tg: payload['Telegram'], inst: payload['Instagram'],
           address: payload['Адрес']
         });
         updateMasterInfo();
         renderMyBookings();
         alert('✅ Профиль сохранён');
-      } else alert('Ошибка: ' + (res.error || 'неизвестно'));
+      } else alert('Ошибка: ' + (res.error || '?'));
     }
 
     function changeAvatar() {
@@ -3450,13 +2003,11 @@
       const list = [];
       const now = new Date();
       const in24h = new Date(now.getTime() + 24 * 60 * 60 * 1000);
-
       clients.forEach(c => {
         c.visits.forEach(v => {
           const visitDate = new Date(v.date + 'T' + v.time);
           if (visitDate <= now) return;
           const reminderDate = new Date(visitDate.getTime() - 24 * 60 * 60 * 1000);
-
           if (!c.tg) {
             if (reminderDate <= in24h) {
               list.push({ id: c.id + '-' + v.date + '-' + v.time, clientName: c.name, date: v.date, time: v.time, service: v.service, status: 'no-tg', reminderAt: reminderDate });
@@ -3476,25 +2027,13 @@
       const sent = all.filter(r => r.status === 'sent');
       const scheduled = all.filter(r => r.status === 'scheduled');
       const noTg = all.filter(r => r.status === 'no-tg');
-
       document.getElementById('reminderSentCount').textContent = sent.length;
       document.getElementById('reminderScheduledCount').textContent = scheduled.length + noTg.length;
-
       const container = document.getElementById('remindersContent');
       container.innerHTML = '';
-
-      if (sent.length > 0) {
-        container.innerHTML += '<div class="section-label">Отправлено</div>';
-        sent.forEach(r => container.appendChild(createReminderCard(r)));
-      }
-      if (scheduled.length > 0) {
-        container.innerHTML += '<div class="section-label">Уйдёт сегодня</div>';
-        scheduled.forEach(r => container.appendChild(createReminderCard(r)));
-      }
-      if (noTg.length > 0) {
-        container.innerHTML += '<div class="section-label">⚠️ Позвонить вручную</div>';
-        noTg.forEach(r => container.appendChild(createReminderCard(r)));
-      }
+      if (sent.length > 0) { container.innerHTML += '<div class="section-label">Отправлено</div>'; sent.forEach(r => container.appendChild(createReminderCard(r))); }
+      if (scheduled.length > 0) { container.innerHTML += '<div class="section-label">Уйдёт сегодня</div>'; scheduled.forEach(r => container.appendChild(createReminderCard(r))); }
+      if (noTg.length > 0) { container.innerHTML += '<div class="section-label">⚠️ Позвонить вручную</div>'; noTg.forEach(r => container.appendChild(createReminderCard(r))); }
       if (all.length === 0) {
         container.innerHTML = '<div class="card" style="text-align:center; padding: 40px 20px; color: var(--text-muted); font-size: 14px; font-weight: 600;">Пока нет напоминаний</div>';
       }
@@ -3533,17 +2072,14 @@
     function renderHome() {
       const now = new Date();
       const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-
       document.getElementById('homeDate').textContent = now.getDate() + ' ' + MONTHS_GEN[now.getMonth()];
       document.getElementById('homeDay').textContent = DAYS_FULL[now.getDay()];
-
       const allVisits = getAllVisits();
       const todayVisits = allVisits.filter(v => {
         const d = new Date(v.date);
         return d.getDate() === today.getDate() && d.getMonth() === today.getMonth() && d.getFullYear() === today.getFullYear();
       });
       const todaySum = todayVisits.reduce((s, v) => s + v.amount, 0);
-
       document.getElementById('homeTodayCount').textContent = todayVisits.length;
       document.getElementById('homeTodaySum').textContent = todaySum + ' Br';
 
@@ -3552,7 +2088,6 @@
         const d = new Date(v.date);
         return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
       }).reduce((s, v) => s + v.amount, 0);
-
       document.getElementById('homeMonthIncome').textContent = monthIncome + ' Br';
 
       const upcoming = allVisits
@@ -3593,18 +2128,15 @@
       const startOfWeek = new Date(now);
       startOfWeek.setDate(now.getDate() - ((now.getDay() + 6) % 7));
       startOfWeek.setHours(0,0,0,0);
-
       const days = [];
       for (let i = 0; i < 7; i++) {
         const d = new Date(startOfWeek);
         d.setDate(startOfWeek.getDate() + i);
         days.push(d);
       }
-
       const allVisits = getAllVisits();
       let html = `<div class="month-label">${MONTHS[now.getMonth()]} ${now.getFullYear()}</div>`;
       let totalCount = 0, totalSum = 0;
-
       days.forEach(d => {
         const visits = allVisits.filter(v => {
           const vd = new Date(v.date);
@@ -3623,7 +2155,6 @@
           </div>
         `;
       });
-
       html += `
         <div class="day-row total">
           <div class="day-name">Итого:</div>
@@ -3644,6 +2175,6 @@
         cat.classList.add('selected');
       });
     });
-</script>  
+  </script>
 </body>
 </html>
