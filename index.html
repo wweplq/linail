@@ -547,8 +547,7 @@ async function saveApi(action,payload){return apiGet(action,payload)}
 
 async function loadAllData(){
   const data=await apiGet('getAll');
-  alert('СЕРВЕР ПРИСЛАЛ ВИЗИТЫ:\n\n' + JSON.stringify((data.visits||[]).map(v=>({id:v.ID,clientId:v['КлиентID'],tgId:v['TelegramID'],date:v['Дата'],time:v['Время'],client:v['Клиент']})), null, 1));
-  if(data.ok){
+   if(data.ok){
     services=(data.services||[]).map(s=>({
       id:parseInt(s.ID),name:toStr(s['Название']),price:parseFloat(s['Цена'])||0,
       duration:parseInt(s['Длительность'])||60,desc:toStr(s['Описание']),
