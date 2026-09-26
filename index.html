@@ -52,6 +52,8 @@ body{padding-bottom:40px}
 .month-label{font-size:13px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:1px;margin-bottom:14px}
 .day-row{display:grid;grid-template-columns:1fr auto auto;gap:16px;padding:14px 0;border-bottom:1px solid var(--border);align-items:center}
 .day-row:last-child{border-bottom:none}
+.day-row.clickable{cursor:pointer;border-radius:12px;padding-left:8px;padding-right:8px;margin-left:-8px;margin-right:-8px;transition:background .15s}
+.day-row.clickable:active{background:var(--blue-light)}
 .day-name{font-size:15px;font-weight:500;color:var(--text)}
 .day-name.today{color:var(--blue);font-weight:700;position:relative;padding-left:14px}
 .day-name.today::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:6px;height:6px;border-radius:50%;background:var(--blue);box-shadow:0 0 0 3px var(--blue-soft)}
@@ -76,9 +78,11 @@ body{padding-bottom:40px}
 .time-slot{padding:16px 8px;border-radius:16px;border:1.5px solid var(--border);background:#FFF;text-align:center;font-size:15px;font-weight:600;color:var(--text);cursor:pointer}
 .time-slot.selected{border-color:transparent;background:linear-gradient(135deg,#4A90E2,#2C6BB5);color:#FFF}
 .time-slot.booked{background:var(--danger-light);color:var(--danger);text-decoration:line-through;opacity:.6;cursor:not-allowed;border-color:#FFD5D5}
+.time-slot.dayoff{background:var(--bg);color:var(--text-muted);text-decoration:line-through;opacity:.5;cursor:not-allowed}
 .input-field{width:100%;padding:16px 18px;border-radius:16px;border:1.5px solid var(--border);font-size:15px;font-weight:500;color:var(--text);background:#FFF;outline:none;font-family:inherit}
 .input-field:focus{border-color:var(--blue);box-shadow:0 0 0 4px var(--blue-soft)}
-.window-item{display:flex;align-items:center;gap:14px;padding:18px;border-radius:20px;background:#FFF;border:1.5px solid var(--border);margin-bottom:10px}
+.window-item{display:flex;align-items:center;gap:14px;padding:18px;border-radius:20px;background:#FFF;border:1.5px solid var(--border);margin-bottom:10px;cursor:pointer;transition:all .15s}
+.window-item:active{transform:scale(.98)}
 .window-item.booked{background:linear-gradient(135deg,#FFF5F5,#FFEBEB);border-color:#FFD5D5}
 .window-item.free{background:linear-gradient(135deg,#F0FBF3,#E5F8EB);border-color:#C8ECD3}
 .window-dot{width:10px;height:10px;border-radius:50%;background:var(--success);flex-shrink:0}
@@ -209,6 +213,8 @@ body{padding-bottom:40px}
 .client-action-btn-icon{font-size:22px}
 .visit-item{display:flex;align-items:center;gap:14px;padding:14px 0;border-bottom:1px solid var(--border)}
 .visit-item:last-child{border-bottom:none}
+.visit-item.clickable{cursor:pointer;border-radius:12px;padding-left:8px;padding-right:8px;margin-left:-8px;margin-right:-8px;transition:background .15s}
+.visit-item.clickable:active{background:var(--blue-light)}
 .visit-date-block{text-align:center;width:48px;flex-shrink:0}
 .visit-day{font-size:20px;font-weight:800;color:var(--text);line-height:1}
 .visit-month{font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-top:4px}
@@ -279,6 +285,11 @@ body{padding-bottom:40px}
 .modal{background:#FFF;border-radius:32px 32px 0 0;padding:28px 22px;width:100%;max-width:600px;max-height:90vh;overflow-y:auto}
 .modal-handle{width:44px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 24px}
 .modal-title{font-size:22px;font-weight:800;color:var(--text);margin-bottom:24px;text-align:center}
+.visit-detail-row{display:flex;align-items:center;gap:14px;padding:14px 0;border-bottom:1px solid var(--border);font-size:15px}
+.visit-detail-row:last-child{border-bottom:none}
+.visit-detail-icon{font-size:18px;width:32px;height:32px;display:flex;align-items:center;justify-content:center;background:var(--blue-soft);border-radius:10px;flex-shrink:0}
+.visit-detail-label{color:var(--text-muted);font-size:13px;font-weight:600}
+.visit-detail-value{color:var(--text);font-weight:700;font-size:15px;text-align:right;flex:1;word-break:break-word}
 .success-overlay{position:fixed;inset:0;background:rgba(26,43,74,.6);z-index:400;display:none;align-items:center;justify-content:center;padding:20px}
 .success-overlay.open{display:flex}
 .success-card{background:#FFF;border-radius:32px;padding:36px 28px;width:100%;max-width:440px;text-align:center}
@@ -302,7 +313,7 @@ body{padding-bottom:40px}
           <div class="avatar" id="masterAvatarTop">💅</div>
           <div>
             <div class="header-title">Linail Brest</div>
-            <div class="header-subtitle">Елизавета Остапенко</div>
+            <div class="header-subtitle" id="headerMasterName">Мастер</div>
           </div>
         </div>
         <button class="header-menu" onclick="toggleMenu()">☰</button>
@@ -335,7 +346,7 @@ body{padding-bottom:40px}
         <div class="date-nav-sub" id="currentDayOfWeek">—</div>
         <div class="section-label">Окна на день</div>
         <div id="windowsList"></div>
-        <div style="margin-top:20px"><button class="btn-primary" style="margin-bottom:12px" onclick="openGenerateMonth()">🚀 Сгенерировать месяц</button><button class="btn-danger" onclick="makeDayOff()">🚫 Сделать выходным</button></div>
+        <div style="margin-top:20px"><button class="btn-primary" style="margin-bottom:12px" onclick="openGenerateMonth()">🚀 Сгенерировать месяц</button><button class="btn-danger" id="dayOffBtn" onclick="makeDayOff()">🚫 Сделать выходным</button></div>
       </div>
       <div id="viewMonth" style="display:none">
         <div class="date-nav"><button class="date-nav-btn" onclick="prevMonth()">←</button><div class="date-nav-center" id="currentMonth">—</div><button class="date-nav-btn" onclick="nextMonth()">→</button></div>
@@ -441,7 +452,7 @@ body{padding-bottom:40px}
     <div class="content">
       <div class="section-label">Опасная зона</div>
       <div class="card"><button class="btn-danger" onclick="resetData()">🗑 Сбросить все данные</button></div>
-      <div style="text-align:center;font-size:12px;color:var(--text-muted);font-weight:500;margin-top:24px">Linail Brest<br>v4.0</div>
+      <div style="text-align:center;font-size:12px;color:var(--text-muted);font-weight:500;margin-top:24px">Linail Brest<br>v5.1</div>
     </div>
   </div>
   <div class="bottom-nav">
@@ -479,14 +490,14 @@ body{padding-bottom:40px}
 
 <div class="menu-overlay" id="menuOverlay" onclick="toggleMenu()"></div>
 <div class="menu-panel" id="menuPanel">
-  <div class="menu-header"><div class="menu-avatar" id="menuAvatar">💅</div><div><div class="menu-user">Елизавета</div><div class="menu-role">Мастер · Linail Brest</div></div></div>
+  <div class="menu-header"><div class="menu-avatar" id="menuAvatar">💅</div><div><div class="menu-user" id="menuUserName">Мастер</div><div class="menu-role">Мастер · Linail Brest</div></div></div>
   <div class="menu-list">
     <button class="menu-item" onclick="toggleMenu();showScreen('services')"><span class="menu-item-icon">💅</span><span>Услуги и цены</span></button>
     <button class="menu-item" onclick="toggleMenu();showScreen('profile')"><span class="menu-item-icon">👤</span><span>Мой профиль</span></button>
     <button class="menu-item" onclick="toggleMenu();showScreen('reminders')"><span class="menu-item-icon">🔔</span><span>Напоминания</span></button>
     <button class="menu-item" onclick="toggleMenu();showScreen('settings')"><span class="menu-item-icon">⚙️</span><span>Настройки</span></button>
   </div>
-  <div class="menu-footer"><div style="font-weight:700;margin-bottom:8px">Нужна помощь?</div><div>Напишите в Telegram</div></div>
+  <div class="menu-footer"><div style="font-weight:700;margin-bottom:8px">Нужна помощь?</div><div>@tgbotthee</div></div>
 </div>
 
 <div class="modal-overlay" id="modalAddWindow"><div class="modal"><div class="modal-handle"></div><div class="modal-title">Добавить окно</div><div class="form-group"><label class="form-label">Дата</label><input type="date" class="form-input" id="newWindowDate"></div><div class="form-group"><label class="form-label">Начало</label><input type="time" class="form-input" id="newWindowTime" value="11:00"></div><button class="btn-primary" onclick="addWindow()">✅ Добавить</button></div></div>
@@ -509,6 +520,8 @@ body{padding-bottom:40px}
 
 <div class="modal-overlay" id="modalVisit"><div class="modal"><div class="modal-handle"></div><div class="modal-title">Добавить визит</div><div class="form-group"><label class="form-label">Услуга</label><select class="form-input" id="visitService"></select></div><div class="form-group"><label class="form-label">Дата</label><input type="date" class="form-input" id="visitDate"></div><div class="form-group"><label class="form-label">Время</label><input type="time" class="form-input" id="visitTime" value="11:00"></div><div class="form-group"><label class="form-label">Сумма (Br)</label><input type="number" class="form-input" id="visitAmount" min="0"></div><button class="btn-primary" onclick="saveVisit()">✅ Добавить визит</button></div></div>
 
+<div class="modal-overlay" id="modalVisitDetail"><div class="modal"><div class="modal-handle"></div><div class="modal-title">Запись</div><div id="visitDetailContent"></div><button class="btn-primary" style="margin-top:20px;margin-bottom:10px" onclick="notifyClientFromDetail()">✈️ Написать клиенту</button><button class="btn-danger" onclick="deleteVisitFromDetail()">🗑 Удалить запись</button></div></div>
+
 <div class="success-overlay" id="successOverlay"><div class="success-card"><div class="success-icon">✓</div><div class="success-title">Вы записаны!</div><div class="success-subtitle" id="successSubtitle">Ждём вас</div><div class="success-info" id="successInfo"></div><div class="success-hint">⏰ За день до визита придёт напоминание в Telegram</div><button class="btn-primary" onclick="closeSuccess()">Понятно</button></div></div>
 
 <script>
@@ -518,6 +531,7 @@ const OWNER_ID = 705780209;
 let services = [];
 let clients = [];
 let expenses = [];
+let daysOff = {};
 let masterProfile = {};
 let bookingSubmitting = false;
 
@@ -535,6 +549,13 @@ function formatDateOnly(d){
   return y+'-'+m+'-'+day;
 }
 
+function dateToStr(d){
+  const y=d.getFullYear();
+  const m=String(d.getMonth()+1).padStart(2,'0');
+  const day=String(d.getDate()).padStart(2,'0');
+  return y+'-'+m+'-'+day;
+}
+
 async function apiGet(action,payload){
   try{
     let url=API_URL+'?action='+encodeURIComponent(action);
@@ -547,7 +568,7 @@ async function saveApi(action,payload){return apiGet(action,payload)}
 
 async function loadAllData(){
   const data=await apiGet('getAll');
-   if(data.ok){
+  if(data.ok){
     services=(data.services||[]).map(s=>({
       id:parseInt(s.ID),name:toStr(s['Название']),price:parseFloat(s['Цена'])||0,
       duration:parseInt(s['Длительность'])||60,desc:toStr(s['Описание']),
@@ -559,51 +580,58 @@ async function loadAllData(){
       telegramId:c['TelegramID']?Number(c['TelegramID']):null,
       createdAt:toStr(c['Дата создания']),visits:[]
     }));
-    
+
     (data.visits||[]).forEach(v=>{
       const clientId=parseInt(v['КлиентID']);
       const clientName=toStr(v['Клиент']).trim();
-      
+
       let client=clients.find(c=>c.id===clientId);
       if(!client&&clientName){
         client=clients.find(c=>(c.name||'').trim().toLowerCase()===clientName.toLowerCase());
       }
-      
+
       if(!client){
         client={
           id:'virt_'+v.ID,
           name:clientName||'Клиент',
-          phone:'',tg:'',inst:'',notes:'',
+          phone:toStr(v['Телефон']||''),tg:toStr(v['Telegram']||''),inst:'',notes:'',
           telegramId:v['TelegramID']?Number(v['TelegramID']):null,
           createdAt:'',visits:[]
         };
         clients.push(client);
       }
-      
+
       client.visits.push({
         id:parseInt(v.ID),
         date:formatDateOnly(v['Дата']),
         time:toStr(v['Время']).substring(0,5),
         service:toStr(v['Услуга']),
         amount:parseFloat(v['Сумма'])||0,
+        phone:toStr(v['Телефон']||client.phone||''),
+        tg:toStr(v['Telegram']||client.tg||''),
         telegramId:v['TelegramID']?Number(v['TelegramID']):null
       });
     });
-    
+
     expenses=(data.expenses||[]).map(e=>({
       id:parseInt(e.ID),category:toStr(e['Категория']),
       amount:parseFloat(e['Сумма'])||0,date:toStr(e['Дата']),
       comment:toStr(e['Комментарий'])
     }));
-    
+
+    daysOff={};
+    (data.daysOff||[]).forEach(d=>{
+      const date=formatDateOnly(d['Дата']);
+      if(date)daysOff[date]=true;
+    });
+
     const settings=data.settings||{};
     masterProfile={
       name:toStr(settings['Имя мастера'])||'Мастер',
       studio:toStr(settings['Студия']),desc:toStr(settings['Описание']),
       phone:toStr(settings['Телефон']),tg:toStr(settings['Telegram']),
       inst:toStr(settings['Instagram']),address:toStr(settings['Адрес']),
-      photo:toStr(settings['Фото']),
-      windows:toStr(settings['Стандартные окна'])||'11:00, 13:00, 15:00, 17:00, 19:00'
+      photo:toStr(settings['Фото'])
     };
   }
   renderAll();
@@ -639,6 +667,10 @@ function updateMasterInfo(){
   document.getElementById('clientPhoneView').textContent=masterProfile.phone||'';
   document.getElementById('clientTgView').textContent=masterProfile.tg||'';
   document.getElementById('clientInstView').textContent=masterProfile.inst||'';
+  const hn=document.getElementById('headerMasterName');
+  if(hn)hn.textContent=masterProfile.name||'Мастер';
+  const mn=document.getElementById('menuUserName');
+  if(mn)mn.textContent=masterProfile.name||'Мастер';
 }
 
 const tg=window.Telegram?.WebApp;
@@ -677,6 +709,7 @@ function showScreen(name){
   if(name==='reminders')renderReminders();
   if(name==='finance')renderFinance();
   if(name==='profile')renderProfileInputs();
+  if(name==='windows'){updateDateDisplay();updateDayOffButton();}
 }
 
 function toggleMenu(){
@@ -700,9 +733,55 @@ function updateDateDisplay(){
   const isToday=dCopy.getTime()===today.getTime();
   document.getElementById('currentDayOfWeek').textContent=DAYS_FULL[currentDate.getDay()]+(isToday?' · Сегодня':'');
   document.getElementById('headerSubtitle').textContent=formatDateFull(currentDate);
+  renderWindowsList();
 }
-function prevDay(){currentDate.setDate(currentDate.getDate()-1);updateDateDisplay()}
-function nextDay(){currentDate.setDate(currentDate.getDate()+1);updateDateDisplay()}
+
+function updateDayOffButton(){
+  const btn=document.getElementById('dayOffBtn');
+  if(!btn)return;
+  const key=dateToStr(currentDate);
+  if(daysOff[key]){
+    btn.textContent='✅ Убрать выходной';
+    btn.style.background='var(--success-light)';
+    btn.style.color='var(--success)';
+  }else{
+    btn.textContent='🚫 Сделать выходным';
+    btn.style.background='';
+    btn.style.color='';
+  }
+}
+
+function renderWindowsList(){
+  const container=document.getElementById('windowsList');
+  if(!container)return;
+  container.innerHTML='';
+  const key=dateToStr(currentDate);
+  if(daysOff[key]){
+    container.innerHTML='<div class="window-item" style="background:var(--bg);border-color:var(--border);cursor:default"><div class="window-dot" style="background:var(--text-muted)"></div><div class="window-time" style="color:var(--text-muted)">Выходной день</div><div class="window-status" style="color:var(--text-muted)">закрыто</div></div>';
+    return;
+  }
+  const times=['11:00','13:00','15:00','17:00','19:00'];
+  const allVisits=getAllVisits();
+  times.forEach(time=>{
+    const visit=allVisits.find(v=>v.date===key&&v.time===time);
+    const item=document.createElement('div');
+    item.className='window-item '+(visit?'booked':'free');
+    item.innerHTML=`<div class="window-dot"></div><div class="window-time">${time} — ${padTime(time,2)}</div><div class="window-status">${visit?'занято':'свободно'}</div>`;
+    if(visit){
+      item.onclick=()=>openVisitDetail(visit);
+    }
+    container.appendChild(item);
+  });
+}
+
+function padTime(t,h){
+  const [hh,mm]=t.split(':').map(Number);
+  const endH=hh+h;
+  return String(endH).padStart(2,'0')+':'+String(mm).padStart(2,'0');
+}
+
+function prevDay(){currentDate.setDate(currentDate.getDate()-1);updateDateDisplay();updateDayOffButton()}
+function nextDay(){currentDate.setDate(currentDate.getDate()+1);updateDateDisplay();updateDayOffButton()}
 function updateMonthDisplay(){
   document.getElementById('currentMonth').textContent=MONTHS[currentMonthDate.getMonth()]+' '+currentMonthDate.getFullYear();
   renderMonthGrid();
@@ -720,8 +799,10 @@ function renderMonthGrid(){
   const times=['11:00','13:00','15:00','17:00','19:00'];
   for(let day=1;day<=daysInMonth;day++){
     const date=new Date(year,month,day);
+    const key=dateToStr(date);
     const dayOfWeek=date.getDay();
     const isWeekend=dayOfWeek===0||dayOfWeek===6;
+    const isDayOff=daysOff[key]||isWeekend;
     const isToday=date.getTime()===today.getTime();
     const row=document.createElement('div');
     row.className='month-grid-row';
@@ -731,16 +812,17 @@ function renderMonthGrid(){
     row.appendChild(dayLabel);
     times.forEach(time=>{
       const cell=document.createElement('div');
-      if(isWeekend)cell.className='month-grid-cell off';
+      if(isDayOff)cell.className='month-grid-cell off';
       else{
         const visit=findVisit(day,month,year,time);
         cell.className='month-grid-cell'+(visit?' booked':'');
         cell.textContent=visit?'●':time.split(':')[0];
       }
       cell.onclick=()=>{
-        if(!isWeekend){
+        if(!isDayOff){
           currentDate=new Date(year,month,day);
           updateDateDisplay();
+          updateDayOffButton();
           switchView('day');
         }
       };
@@ -755,7 +837,7 @@ function findVisit(day,month,year,time){
     for(const v of client.visits){
       const d=new Date(v.date);
       if(d.getDate()===day&&d.getMonth()===month&&d.getFullYear()===year&&v.time===time){
-        return {client:client.name,service:v.service};
+        return {client:client.name,service:v.service,visit:v,clientObj:client};
       }
     }
   }
@@ -770,10 +852,10 @@ function switchView(view){
   if(view==='month')updateMonthDisplay();
 }
 
-function openAddWindow(){document.getElementById('newWindowDate').value=currentDate.toISOString().split('T')[0];document.getElementById('modalAddWindow').classList.add('open')}
+function openAddWindow(){document.getElementById('newWindowDate').value=dateToStr(currentDate);document.getElementById('modalAddWindow').classList.add('open')}
 function openGenerateMonth(){document.getElementById('genMonth').value=new Date().toISOString().slice(0,7);document.getElementById('modalGenerateMonth').classList.add('open')}
 function openAddService(){editingServiceId=null;document.getElementById('modalServiceTitle').textContent='Новая услуга';document.getElementById('serviceName').value='';document.getElementById('servicePrice').value='';document.getElementById('serviceDurationInput').value='60';document.getElementById('serviceDesc').value='';document.getElementById('deleteServiceBtn').style.display='none';document.getElementById('modalService').classList.add('open')}
-function openAddExpense(){document.getElementById('expenseAmount').value='';document.getElementById('expenseComment').value='';document.getElementById('expenseDate').value=new Date().toISOString().split('T')[0];document.querySelectorAll('.expense-category').forEach((c,i)=>c.classList.toggle('selected',i===0));document.getElementById('modalExpense').classList.add('open')}
+function openAddExpense(){document.getElementById('expenseAmount').value='';document.getElementById('expenseComment').value='';document.getElementById('expenseDate').value=dateToStr(new Date());document.querySelectorAll('.expense-category').forEach((c,i)=>c.classList.toggle('selected',i===0));document.getElementById('modalExpense').classList.add('open')}
 function openAddClient(){editingClientId=null;document.getElementById('modalClientTitle').textContent='Новый клиент';['clientNameInput','clientPhoneInput','clientTgInput','clientNotesInput'].forEach(id=>document.getElementById(id).value='');document.getElementById('deleteClientBtn').style.display='none';document.getElementById('modalClient').classList.add('open')}
 
 function openEditClient(){
@@ -804,7 +886,7 @@ function openAddVisit(){
     const opt=select.options[select.selectedIndex];
     document.getElementById('visitAmount').value=opt.dataset.price;
   };
-  document.getElementById('visitDate').value=new Date().toISOString().split('T')[0];
+  document.getElementById('visitDate').value=dateToStr(new Date());
   document.getElementById('visitTime').value='11:00';
   document.getElementById('visitAmount').value=services[0]?.price||55;
   document.getElementById('modalVisit').classList.add('open');
@@ -815,8 +897,41 @@ document.querySelectorAll('.modal-overlay').forEach(m=>{
 });
 
 function addWindow(){document.getElementById('modalAddWindow').classList.remove('open');alert('✅ Окно добавлено')}
-function generateMonth(){document.getElementById('modalGenerateMonth').classList.remove('open');alert('🚀 Месяц сгенерирован')}
-function makeDayOff(){if(confirm('Сделать выходным?'))alert('🚫 Выходной')}
+
+async function generateMonth(){
+  const monthInput=document.getElementById('genMonth').value;
+  if(!monthInput){alert('Выберите месяц');return}
+  document.getElementById('modalGenerateMonth').classList.remove('open');
+  const [year,month]=monthInput.split('-').map(Number);
+  const daysInMonth=new Date(year,month,0).getDate();
+  let count=0;
+  for(let day=1;day<=daysInMonth;day++){
+    const d=new Date(year,month-1,day);
+    const dow=d.getDay();
+    if(dow===0||dow===6)continue;
+    const key=dateToStr(d);
+    if(!daysOff[key]){
+      count++;
+    }
+  }
+  alert('🚀 Готово!\n\nНа месяц открыто '+count+' рабочих дней.\nВыходные (сб, вс) — закрыты автоматически.');
+}
+
+async function makeDayOff(){
+  const key=dateToStr(currentDate);
+  if(daysOff[key]){
+    if(!confirm('Убрать выходной на этот день?'))return;
+    delete daysOff[key];
+    await saveApi('saveDayOff',{'Дата':key,'Удалить':true});
+  }else{
+    if(!confirm('Сделать этот день выходным?\nКлиенты не смогут записаться.'))return;
+    daysOff[key]=true;
+    await saveApi('saveDayOff',{'Дата':key});
+  }
+  updateDayOffButton();
+  renderWindowsList();
+  renderMonthGrid();
+}
 
 let editingServiceId=null;
 function formatDuration(min){
@@ -906,6 +1021,7 @@ async function toggleService(id){
 let currentClientFilter='all';
 let currentClientId=null;
 let editingClientId=null;
+let currentVisitDetail=null;
 
 function getClientStatus(client){
   if(client.visits.length===0)return {type:'new',label:'Новый'};
@@ -986,12 +1102,53 @@ function openClientProfile(id){
     sorted.forEach(v=>{
       const d=new Date(v.date);
       const item=document.createElement('div');
-      item.className='visit-item';
+      item.className='visit-item clickable';
+      item.onclick=()=>openVisitDetail(v);
       item.innerHTML=`<div class="visit-date-block"><div class="visit-day">${d.getDate()}</div><div class="visit-month">${MONTHS_GEN[d.getMonth()].substring(0,3)}</div></div><div class="visit-info"><div class="visit-service">${v.service}</div><div class="visit-time">${v.time}</div></div><div class="visit-amount">${v.amount} Br</div>`;
       visitsList.appendChild(item);
     });
   }
   showScreen('clientProfile');
+}
+
+function openVisitDetail(visit){
+  currentVisitDetail=visit;
+  const d=new Date(visit.date);
+  const tgLink=visit.tg?'<a href="https://t.me/'+visit.tg.replace('@','')+'" target="_blank" style="color:var(--blue)">'+visit.tg+'</a>':(visit.tg||'—');
+  document.getElementById('visitDetailContent').innerHTML=`
+    <div class="visit-detail-row"><div class="visit-detail-icon">👤</div><div class="visit-detail-label">Клиент</div><div class="visit-detail-value">${visit.clientName||visit.name||'—'}</div></div>
+    <div class="visit-detail-row"><div class="visit-detail-icon">📞</div><div class="visit-detail-label">Телефон</div><div class="visit-detail-value">${visit.phone||'—'}</div></div>
+    <div class="visit-detail-row"><div class="visit-detail-icon">✈️</div><div class="visit-detail-label">Telegram</div><div class="visit-detail-value">${tgLink}</div></div>
+    <div class="visit-detail-row"><div class="visit-detail-icon">💅</div><div class="visit-detail-label">Услуга</div><div class="visit-detail-value">${visit.service}</div></div>
+    <div class="visit-detail-row"><div class="visit-detail-icon">📅</div><div class="visit-detail-label">Дата</div><div class="visit-detail-value">${DAYS_FULL[d.getDay()]}, ${d.getDate()} ${MONTHS_GEN[d.getMonth()]}</div></div>
+    <div class="visit-detail-row"><div class="visit-detail-icon">🕐</div><div class="visit-detail-label">Время</div><div class="visit-detail-value">${visit.time}</div></div>
+    <div class="visit-detail-row"><div class="visit-detail-icon">💰</div><div class="visit-detail-label">Сумма</div><div class="visit-detail-value">${visit.amount} Br</div></div>
+  `;
+  document.getElementById('modalVisitDetail').classList.add('open');
+}
+
+function notifyClientFromDetail(){
+  if(!currentVisitDetail)return;
+  const tgUser=currentVisitDetail.tg;
+  if(!tgUser){alert('У этого клиента нет Telegram');return}
+  window.open('https://t.me/'+tgUser.replace('@',''),'_blank');
+}
+
+async function deleteVisitFromDetail(){
+  if(!currentVisitDetail)return;
+  if(!confirm('Удалить эту запись?\n\nКлиент: '+(currentVisitDetail.clientName||currentVisitDetail.name||'—')+'\nУслуга: '+currentVisitDetail.service+'\nДата: '+currentVisitDetail.date+' '+currentVisitDetail.time))return;
+  const res=await saveApi('deleteVisit',{ID:currentVisitDetail.id});
+  if(res.ok){
+    clients.forEach(c=>{
+      c.visits=c.visits.filter(v=>v.id!==currentVisitDetail.id);
+    });
+    document.getElementById('modalVisitDetail').classList.remove('open');
+    renderAll();
+    if(document.getElementById('screenClientProfile').classList.contains('active')&&currentClientId){
+      openClientProfile(currentClientId);
+    }
+    alert('✅ Запись удалена');
+  }else alert('Ошибка: '+(res.error||'?'));
 }
 
 function callClient(){
@@ -1019,14 +1176,14 @@ async function saveClient(){
   const tg_=document.getElementById('clientTgInput').value.trim();
   const notes=document.getElementById('clientNotesInput').value.trim();
   if(!name){alert('Введите имя');return}
-  const payload={ID:editingClientId,'Имя':name,'Телефон':phone,'Telegram':tg_,'Instagram':'','Заметки':notes,'TelegramID':'','Дата создания':new Date().toISOString().split('T')[0]};
+  const payload={ID:editingClientId,'Имя':name,'Телефон':phone,'Telegram':tg_,'Instagram':'','Заметки':notes,'TelegramID':'','Дата создания':dateToStr(new Date())};
   const res=await saveApi('saveClient',payload);
   if(res.ok){
     if(editingClientId){
       const c=clients.find(x=>x.id===editingClientId);
       Object.assign(c,{name,phone,tg:tg_,notes});
     }else{
-      clients.push({id:res.id||Math.max(...clients.map(c=>c.id),0)+1,name,phone,tg:tg_,inst:'',notes,telegramId:null,createdAt:new Date().toISOString().split('T')[0],visits:[]});
+      clients.push({id:res.id||Math.max(...clients.map(c=>c.id),0)+1,name,phone,tg:tg_,inst:'',notes,telegramId:null,createdAt:dateToStr(new Date()),visits:[]});
     }
     renderClients();
     document.getElementById('modalClient').classList.remove('open');
@@ -1057,10 +1214,10 @@ async function saveVisit(){
   const amount=parseInt(document.getElementById('visitAmount').value);
   if(!date){alert('Дата');return}
   if(!amount||amount<=0){alert('Сумма');return}
-  const payload={'КлиентID':c.id,'Клиент':c.name,'Услуга':opt.dataset.name,'Дата':date,'Время':time,'Сумма':amount,'TelegramID':c.telegramId||'','Создано':new Date().toISOString()};
+  const payload={'КлиентID':c.id,'Клиент':c.name,'Услуга':opt.dataset.name,'Дата':date,'Время':time,'Сумма':amount,'TelegramID':c.telegramId||'','Телефон':c.phone||'','Telegram':c.tg||'','Создано':new Date().toISOString()};
   const res=await saveApi('saveVisit',payload);
   if(res.ok){
-    c.visits.unshift({id:res.id,date,time,service:opt.dataset.name,amount,telegramId:c.telegramId});
+    c.visits.unshift({id:res.id,date,time,service:opt.dataset.name,amount,phone:c.phone||'',tg:c.tg||'',telegramId:c.telegramId});
     renderClients();
     openClientProfile(c.id);
     document.getElementById('modalVisit').classList.remove('open');
@@ -1144,7 +1301,7 @@ function renderTransactions(visits,expenseList){
   if(!container)return;
   container.innerHTML='';
   const items=[
-    ...visits.map(v=>({type:'income',title:v.clientName+' · '+v.service,date:formatDateShort(v.date),amount:v.amount,ts:new Date(v.date+'T'+v.time).getTime()})),
+    ...visits.map(v=>({type:'income',title:v.clientName+' · '+v.service,date:formatDateShort(v.date),amount:v.amount,ts:new Date(v.date+'T'+v.time).getTime(),visit:v})),
     ...expenseList.map(e=>({type:'expense',title:e.category+(e.comment?' · '+e.comment:''),date:formatDateShort(e.date),amount:e.amount,ts:new Date(e.date).getTime()}))
   ].sort((a,b)=>b.ts-a.ts);
   if(items.length===0){
@@ -1154,6 +1311,10 @@ function renderTransactions(visits,expenseList){
   items.forEach(t=>{
     const item=document.createElement('div');
     item.className='transaction-item';
+    if(t.type==='income'){
+      item.style.cursor='pointer';
+      item.onclick=()=>openVisitDetail(t.visit);
+    }
     item.innerHTML=`<div class="transaction-icon ${t.type}">${t.type==='income'?'💰':'💸'}</div><div class="transaction-info"><div class="transaction-title">${t.title}</div><div class="transaction-date">${t.date}</div></div><div class="transaction-amount ${t.type}">${t.type==='income'?'+':'−'}${t.amount} Br</div>`;
     container.appendChild(item);
   });
@@ -1179,12 +1340,11 @@ async function saveExpense(){
   }else alert('Ошибка: '+(res.error||'?'));
 }
 
-// ЗАПИСЬ КЛИЕНТА
 let selectedBookingService=null;
 let selectedBookingTime=null;
 
 function openBookingModal(){
-  document.getElementById('bookingDate').value=new Date().toISOString().split('T')[0];
+  document.getElementById('bookingDate').value=dateToStr(new Date());
   document.getElementById('bookingName').value='';
   document.getElementById('bookingPhone').value='';
   selectedBookingTime=null;
@@ -1213,13 +1373,16 @@ function renderTimeSlots(){
   grid.innerHTML='';
   const times=['11:00','13:00','15:00','17:00','19:00'];
   selectedBookingTime=null;
+  const dayOff=daysOff[date]||false;
   times.forEach(time=>{
     const booked=isTimeBooked(date,time);
     const slot=document.createElement('div');
-    slot.className='time-slot'+(booked?' booked':'');
+    let cls='time-slot';
+    if(dayOff)cls+=' dayoff';
+    else if(booked)cls+=' booked';
+    slot.className=cls;
     slot.textContent=time;
-    if(booked){slot.style.cursor='not-allowed'}
-    else{
+    if(!dayOff&&!booked){
       slot.onclick=()=>{
         document.querySelectorAll('#bookingTimeGrid .time-slot').forEach(s=>s.classList.remove('selected'));
         slot.classList.add('selected');
@@ -1248,22 +1411,24 @@ async function submitBooking(){
   const phone=document.getElementById('bookingPhone').value.trim();
   if(!selectedBookingService){alert('Выберите услугу');return}
   if(!date){alert('Выберите дату');return}
+  if(daysOff[date]){alert('⚠️ В этот день мастер не работает');return}
   if(!selectedBookingTime){alert('Выберите время');return}
   if(!name){alert('Введите имя');return}
   if(!phone){alert('Введите телефон');return}
   if(isTimeBooked(date,selectedBookingTime)){alert('⚠️ Время занято');renderTimeSlots();return}
-  
+
   bookingSubmitting=true;
   const btn=document.getElementById('submitBookingBtn');
   const orig=btn.textContent;
   btn.disabled=true;
   btn.textContent='⏳ Отправка...';
-  
+
   try{
     const tgId=tg?.initDataUnsafe?.user?.id?Number(tg.initDataUnsafe.user.id):null;
+    const tgUsername=tg?.initDataUnsafe?.user?.username?'@'+tg.initDataUnsafe.user.username:'';
     const myDigits=phoneDigits(phone);
     const myLast9=myDigits.slice(-9);
-    
+
     let client=null;
     if(tgId)client=clients.find(c=>c.telegramId&&Number(c.telegramId)===Number(tgId));
     if(!client&&myLast9){
@@ -1272,39 +1437,38 @@ async function submitBooking(){
         return cDigits&&cDigits.slice(-9)===myLast9;
       });
     }
-    
+
     if(!client){
       const clientPayload={
         'Имя':name,'Телефон':phone,
-        'Telegram':tg?.initDataUnsafe?.user?.username?'@'+tg.initDataUnsafe.user.username:'',
+        'Telegram':tgUsername,
         'Instagram':'','Заметки':'','TelegramID':tgId||'',
-        'Дата создания':new Date().toISOString().split('T')[0]
+        'Дата создания':dateToStr(new Date())
       };
       const clientRes=await saveApi('saveClient',clientPayload);
       if(!clientRes.ok){alert('Ошибка: '+(clientRes.error||'?'));return}
       client={
         id:clientRes.id,name,phone,
-        tg:clientPayload['Telegram'],inst:'',notes:'',
-        telegramId:tgId,createdAt:clientPayload['Дата создания'],visits:[]
+        tg:tgUsername,inst:'',notes:'',
+        telegramId:tgId,createdAt:dateToStr(new Date()),visits:[]
       };
       clients.push(client);
     }
-    
-   const tgUsername = tg?.initDataUnsafe?.user?.username ? '@' + tg.initDataUnsafe.user.username : '';
-const visitPayload={
-  'КлиентID':client.id,'Клиент':client.name,
-  'Телефон':phone,
-  'Telegram':tgUsername || client.tg || '',
-  'Услуга':selectedBookingService.name,
-  'Дата':date,'Время':selectedBookingTime,
-  'Сумма':selectedBookingService.price,
-  'TelegramID':tgId||'',
-  'Создано':new Date().toISOString()
-};
+
+    const visitPayload={
+      'КлиентID':client.id,'Клиент':client.name,
+      'Телефон':phone,
+      'Telegram':tgUsername||client.tg||'',
+      'Услуга':selectedBookingService.name,
+      'Дата':date,'Время':selectedBookingTime,
+      'Сумма':selectedBookingService.price,
+      'TelegramID':tgId||'',
+      'Создано':new Date().toISOString()
+    };
     const visitRes=await saveApi('saveVisit',visitPayload);
     if(visitRes.ok){
       if(visitRes.duplicate){alert('⚠️ Уже есть запись');return}
-      client.visits.unshift({id:visitRes.id,date,time:selectedBookingTime,service:selectedBookingService.name,amount:selectedBookingService.price,telegramId:tgId});
+      client.visits.unshift({id:visitRes.id,date,time:selectedBookingTime,service:selectedBookingService.name,amount:selectedBookingService.price,phone:phone,tg:tgUsername,telegramId:tgId});
       renderClients();
       renderFinance();
       renderMyBookings();
@@ -1334,24 +1498,23 @@ function showSuccess(name,date,time,service){
 }
 function closeSuccess(){document.getElementById('successOverlay').classList.remove('open')}
 
-// МОИ ЗАПИСИ
 function renderMyBookings(){
   const container=document.getElementById('myBookingsList');
   if(!container)return;
-  
+
   const myId=tg?.initDataUnsafe?.user?.id;
   const myIdStr=myId?String(myId):'';
-  
+
   const allVisits=[];
   clients.forEach(c=>{
     c.visits.forEach(v=>{
       allVisits.push({...v, clientName:c.name, clientPhone:c.phone, clientTg:c.tg});
     });
   });
-  
+
   const now=new Date();
   const myBookings=[];
-  
+
   allVisits.forEach(v=>{
     const vTgIdStr=v.telegramId?String(v.telegramId):'';
     if(myIdStr && vTgIdStr === myIdStr){
@@ -1360,14 +1523,14 @@ function renderMyBookings(){
       }
     }
   });
-  
+
   myBookings.sort((a,b)=>new Date(a.date+'T'+a.time)-new Date(b.date+'T'+b.time));
-  
+
   if(myBookings.length===0){
     container.innerHTML='<div class="card" style="text-align:center;padding:24px;color:var(--text-muted);font-size:14px;font-weight:500">У вас пока нет записей</div>';
     return;
   }
-  
+
   container.innerHTML='';
   myBookings.forEach(v=>{
     const d=new Date(v.date);
@@ -1379,7 +1542,6 @@ function renderMyBookings(){
   });
 }
 
-// ПРОФИЛЬ
 function renderProfileInputs(){
   document.getElementById('profileName').value=masterProfile.name||'';
   document.getElementById('profileStudio').value=masterProfile.studio||'';
@@ -1436,7 +1598,6 @@ async function handleAvatarUpload(event){
   reader.readAsDataURL(file);
 }
 
-// НАПОМИНАНИЯ
 function getReminders(){
   const list=[];
   const now=new Date();
@@ -1483,7 +1644,6 @@ function createReminderCard(r){
   return item;
 }
 
-// ГЛАВНАЯ
 function renderHome(){
   const now=new Date();
   const today=new Date(now.getFullYear(),now.getMonth(),now.getDate());
@@ -1502,7 +1662,8 @@ function renderHome(){
     return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear();
   }).reduce((s,v)=>s+v.amount,0);
   document.getElementById('homeMonthIncome').textContent=monthIncome+' Br';
-  const upcoming=allVisits.filter(v=>new Date(v.date+'T'+v.time)>now).sort((a,b)=>new Date(a.date+'T'+a.time)-new Date(b.date+'T'+b.time)).slice(0,3);
+
+  const upcoming=allVisits.filter(v=>new Date(v.date+'T'+v.time)>now).sort((a,b)=>new Date(a.date+'T'+a.time)-new Date(b.date+'T'+b.time)).slice(0,5);
   const upcomingContainer=document.getElementById('homeUpcoming');
   if(upcoming.length===0)upcomingContainer.innerHTML='<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:14px;font-weight:500">Нет ближайших визитов</div>';
   else{
@@ -1510,7 +1671,8 @@ function renderHome(){
     upcoming.forEach(v=>{
       const d=new Date(v.date);
       const item=document.createElement('div');
-      item.className='visit-item';
+      item.className='visit-item clickable';
+      item.onclick=()=>openVisitDetail(v);
       item.innerHTML=`<div class="visit-date-block"><div class="visit-day">${d.getDate()}</div><div class="visit-month">${MONTHS_GEN[d.getMonth()].substring(0,3)}</div></div><div class="visit-info"><div class="visit-service">${v.clientName}</div><div class="visit-time">${v.time} · ${v.service}</div></div><div class="visit-amount">${v.amount} Br</div>`;
       upcomingContainer.appendChild(item);
     });
@@ -1531,23 +1693,35 @@ function renderHomeWeek(){
   let html='<div class="month-label">'+MONTHS[now.getMonth()]+' '+now.getFullYear()+'</div>';
   let totalCount=0,totalSum=0;
   days.forEach(d=>{
-    const visits=allVisits.filter(v=>{
-      const vd=new Date(v.date);
-      return vd.getDate()===d.getDate()&&vd.getMonth()===d.getMonth()&&vd.getFullYear()===d.getFullYear();
-    });
-    const sum=visits.reduce((s,v)=>s+v.amount,0);
-    totalCount+=visits.length;
+    const key=dateToStr(d);
+    const dayVisits=allVisits.filter(v=>v.date===key);
+    const sum=dayVisits.reduce((s,v)=>s+v.amount,0);
+    totalCount+=dayVisits.length;
     totalSum+=sum;
     const isToday=d.getDate()===now.getDate()&&d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear();
     const dayName=['Вс','Пн','Вт','Ср','Чт','Пт','Сб'][d.getDay()];
-    html+=`<div class="day-row"><div class="day-name${isToday?' today':''}">${dayName}., ${d.getDate()}</div><div class="day-count">${visits.length}</div><div class="day-sum">${sum} Br</div></div>`;
+    const clickable=dayVisits.length>0;
+    html+=`<div class="day-row${clickable?' clickable':''}" ${clickable?'data-date="'+key+'"':''}><div class="day-name${isToday?' today':''}">${dayName}., ${d.getDate()}</div><div class="day-count">${dayVisits.length}</div><div class="day-sum">${sum} Br</div></div>`;
   });
   html+=`<div class="day-row total"><div class="day-name">Итого:</div><div class="day-count">${totalCount}</div><div class="day-sum">${totalSum} Br</div></div>`;
   container.innerHTML=html;
+
+  container.querySelectorAll('.day-row.clickable').forEach(row=>{
+    row.onclick=()=>{
+      const date=row.getAttribute('data-date');
+      const dayVisits=getAllVisits().filter(v=>v.date===date);
+      if(dayVisits.length===1){
+        openVisitDetail(dayVisits[0]);
+      }else if(dayVisits.length>1){
+        const list=dayVisits.map(v=>'• '+v.time+' — '+(v.clientName||'')+' ('+v.service+')').join('\n');
+        alert('Записи на '+date+':\n\n'+list);
+      }
+    };
+  });
 }
 
-// ИНИЦИАЛИЗАЦИЯ
 updateDateDisplay();
+updateDayOffButton();
 loadAllData();
 document.querySelectorAll('.expense-category').forEach(cat=>{
   cat.addEventListener('click',()=>{
