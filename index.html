@@ -815,6 +815,20 @@ body { padding-bottom: 40px; }
     let masterProfile = {};
     let bookingSubmitting = false;
 
+    // 🔥 ФИКС: преобразование даты в "2026-09-27"
+    function formatDateOnly(d) {
+      if (!d) return '';
+      if (typeof d === 'string') return d.substring(0, 10);
+      const dt = new Date(d);
+      if (isNaN(dt.getTime())) return '';
+      const y = dt.getFullYear();
+      const m = String(dt.getMonth() + 1).padStart(2, '0');
+      const day = String(dt.getDate()).padStart(2, '0');
+      return y + '-' + m + '-' + day;
+    }
+
+    function toStr(v) { return v == null ? '' : String(v); }
+
     async function apiGet(action, payload) {
       try {
         let url = API_URL + '?action=' + encodeURIComponent(action);
@@ -827,7 +841,6 @@ body { padding-bottom: 40px; }
       }
     }
     async function apiSave(action, payload) { return apiGet(action, payload); }
-    function toStr(v) { return v == null ? '' : String(v); }
 
     async function loadAllData() {
       const data = await apiGet('getAll');
@@ -848,8 +861,11 @@ body { padding-bottom: 40px; }
           const client = clients.find(c => c.id === parseInt(v['КлиентID']));
           if (client) {
             client.visits.push({
-              id: parseInt(v.ID), date: toStr(v['Дата']), time: toStr(v['Время']),
-              service: toStr(v['Услуга']), amount: parseFloat(v['Сумма']) || 0,
+              id: parseInt(v.ID),
+              date: formatDateOnly(v['Дата']),
+              time: toStr(v['Время']).substring(0, 5),
+              service: toStr(v['Услуга']),
+              amount: parseFloat(v['Сумма']) || 0,
               telegramId: v['TelegramID'] ? Number(v['TelegramID']) : null
             });
           }
@@ -1558,7 +1574,7 @@ body { padding-bottom: 40px; }
       document.getElementById('modalBooking').classList.add('open');
     }
 
-    // 🔥 НОВОЕ — показ занятых слотов
+    // 🔥 БЛОКИРОВКА ЗАНЯТЫХ СЛОТОВ
     function renderTimeSlots() {
       const grid = document.getElementById('bookingTimeGrid');
       const date = document.getElementById('bookingDate').value;
@@ -1586,7 +1602,7 @@ body { padding-bottom: 40px; }
       });
     }
 
-    // 🔥 НОВОЕ — проверка занятости слота
+    // 🔥 ПРОВЕРКА — ЗАНЯТ ЛИ СЛОТ
     function isTimeBooked(date, time) {
       if (!date) return false;
       for (const client of clients) {
@@ -1597,7 +1613,7 @@ body { padding-bottom: 40px; }
       return false;
     }
 
-    // 🔥 ПЕРЕДЕЛАНО — защита от двойных записей и блокировка кнопки
+    // 🔥 ЗАЩИТА ОТ ДУБЛЕЙ + БЛОКИРОВКА КНОПКИ
     async function submitBooking() {
       if (bookingSubmitting) return;
 
@@ -1610,7 +1626,6 @@ body { padding-bottom: 40px; }
       if (!name) { alert('Введите имя'); return; }
       if (!phone) { alert('Введите телефон'); return; }
 
-      // Проверка на занятость ещё раз перед сохранением
       if (isTimeBooked(date, selectedBookingTime)) {
         alert('⚠️ Это время уже занято. Выберите другое.');
         renderTimeSlots();
@@ -1698,7 +1713,7 @@ body { padding-bottom: 40px; }
       document.getElementById('successOverlay').classList.remove('open');
     }
 
-    // 🔥 ПЕРЕДЕЛАНО — Мои записи работают с Number
+    // 🔥 МОИ ЗАПИСИ — ФИКС ЧЕРЕЗ Number
     function renderMyBookings() {
       const container = document.getElementById('myBookingsList');
       if (!container) return;
@@ -1764,7 +1779,6 @@ body { padding-bottom: 40px; }
       } else alert('Ошибка: ' + (res.error || '?'));
     }
 
-    // 🔥 НОВОЕ — загрузка аватарки
     function changeAvatar() {
       document.getElementById('avatarFileInput').click();
     }
