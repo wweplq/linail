@@ -640,7 +640,7 @@ body { padding-bottom: 40px; }
           <button class="btn-danger" onclick="resetData()">🗑 Сбросить все данные</button>
         </div>
         <div style="text-align: center; font-size: 12px; color: var(--text-muted); font-weight: 500; margin-top: 24px; line-height: 1.5;">
-          Linail Brest Mini App<br>v2.0
+          Linail Brest Mini App<br>v2.1
         </div>
       </div>
     </div>
@@ -815,7 +815,6 @@ body { padding-bottom: 40px; }
     let masterProfile = {};
     let bookingSubmitting = false;
 
-    // 🔥 ФИКС: преобразование даты в "2026-09-27"
     function formatDateOnly(d) {
       if (!d) return '';
       if (typeof d === 'string') return d.substring(0, 10);
@@ -1574,7 +1573,6 @@ body { padding-bottom: 40px; }
       document.getElementById('modalBooking').classList.add('open');
     }
 
-    // 🔥 БЛОКИРОВКА ЗАНЯТЫХ СЛОТОВ
     function renderTimeSlots() {
       const grid = document.getElementById('bookingTimeGrid');
       const date = document.getElementById('bookingDate').value;
@@ -1602,7 +1600,6 @@ body { padding-bottom: 40px; }
       });
     }
 
-    // 🔥 ПРОВЕРКА — ЗАНЯТ ЛИ СЛОТ
     function isTimeBooked(date, time) {
       if (!date) return false;
       for (const client of clients) {
@@ -1613,7 +1610,6 @@ body { padding-bottom: 40px; }
       return false;
     }
 
-    // 🔥 ЗАЩИТА ОТ ДУБЛЕЙ + БЛОКИРОВКА КНОПКИ
     async function submitBooking() {
       if (bookingSubmitting) return;
 
@@ -1713,27 +1709,38 @@ body { padding-bottom: 40px; }
       document.getElementById('successOverlay').classList.remove('open');
     }
 
-    // 🔥 МОИ ЗАПИСИ — ФИКС ЧЕРЕЗ Number
+    // 🔥 МОИ ЗАПИСИ — сравнение через String (надёжно при любых типах)
     function renderMyBookings() {
       const container = document.getElementById('myBookingsList');
       if (!container) return;
-      const myId = tg?.initDataUnsafe?.user?.id ? Number(tg.initDataUnsafe.user.id) : null;
+
+      const myId = tg?.initDataUnsafe?.user?.id;
       if (!myId) {
         container.innerHTML = '<div class="card" style="text-align:center; padding: 24px; color: var(--text-muted); font-size: 14px; font-weight: 500;">Чтобы видеть свои записи, откройте через Telegram</div>';
         return;
       }
+
+      const myIdStr = String(myId).trim();
       const now = new Date();
       const myBookings = [];
-      clients.forEach(c => c.visits.forEach(v => {
-        if (Number(v.telegramId) === myId && new Date(v.date + 'T' + v.time) > now) {
-          myBookings.push(v);
-        }
-      }));
+
+      clients.forEach(c => {
+        c.visits.forEach(v => {
+          const vTgId = String(v.telegramId || '').trim();
+          const visitDate = new Date(v.date + 'T' + v.time);
+          if (vTgId && vTgId === myIdStr && visitDate > now) {
+            myBookings.push(v);
+          }
+        });
+      });
+
       myBookings.sort((a, b) => new Date(a.date + 'T' + a.time) - new Date(b.date + 'T' + b.time));
+
       if (myBookings.length === 0) {
         container.innerHTML = '<div class="card" style="text-align:center; padding: 24px; color: var(--text-muted); font-size: 14px; font-weight: 500;">У вас пока нет записей</div>';
         return;
       }
+
       container.innerHTML = '';
       myBookings.forEach(v => {
         const d = new Date(v.date);
