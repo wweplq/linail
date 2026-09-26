@@ -1710,28 +1710,73 @@ body { padding-bottom: 40px; }
     }
 
     // 🔥 МОИ ЗАПИСИ — сравнение через String (надёжно при любых типах)
-    function renderMyBookings() {
+      function renderMyBookings() {
       const container = document.getElementById('myBookingsList');
       if (!container) return;
 
+      // Получаем ID и имя пользователя из Telegram
       const myId = tg?.initDataUnsafe?.user?.id;
-      if (!myId) {
-        container.innerHTML = '<div class="card" style="text-align:center; padding: 24px; color: var(--text-muted); font-size: 14px; font-weight: 500;">Чтобы видеть свои записи, откройте через Telegram</div>';
+      const myUsername = tg?.initDataUnsafe?.user?.username;
+      const myFirstName = tg?.initDataUnsafe?.user?.first_name;
+      const myLastName = tg?.initDataUnsafe?.user?.last_name;
+      const myFullName = ((myFirstName || '') + ' ' + (myLastName || '')).trim();
+      
+      // Формируем список всех вариантов, по которым искать
+      const myVariants = [
+        myId ? String(myId).trim() : '',
+        myUsername ? myUsername.toLowerCase().trim() : '',
+        myUsername ? ('@' + myUsername).toLowerCase().trim() : '',
+        myFullName.toLowerCase().trim()
+      ].filter(v => v);
+
+      if (myVariants.length === 0) {
+        container.innerHTML = '<div class="card" style="text-align:center; padding: 24px; color: var(--text-muted); font-size: 14px; font-weight: 500;">Откройте через Telegram</div>';
         return;
       }
 
-      const myIdStr = String(myId).trim();
       const now = new Date();
       const myBookings = [];
 
       clients.forEach(c => {
+        // Проверяем — это МОЙ клиент?
+        const clientMatches = 
+          myVariants.includes(String(c.telegramId || '').trim()) ||
+          myVariants.includes(String(c.tg || '').toLowerCase().trim()) ||
+          myVariants.includes(String(c.name || '').toLowerCase().trim());
+
+        if (!clientMatches) return;
+
+        // Берём его будущие визиты
         c.visits.forEach(v => {
-          const vTgId = String(v.telegramId || '').trim();
           const visitDate = new Date(v.date + 'T' + v.time);
-          if (vTgId && vTgId === myIdStr && visitDate > now) {
+          if (visitDate > now) {
             myBookings.push(v);
           }
         });
+      });
+
+      myBookings.sort((a, b) => new Date(a.date + 'T' + a.time) - new Date(b.date + 'T' + b.time));
+
+      if (myBookings.length === 0) {
+        container.innerHTML = '<div class="card" style="text-align:center; padding: 24px; color: var(--text-muted); font-size: 14px; font-weight: 500;">У вас пока нет записей</div>';
+        return;
+      }
+
+      container.innerHTML = '';
+      myBookings.forEach(v => {
+        const d = new Date(v.date);
+        const dayName = DAYS_FULL[d.getDay()].substring(0, 2);
+        const card = document.createElement('div');
+        card.className = 'booking-card';
+        card.innerHTML = `
+          <div class="booking-date">${dayName}, ${d.getDate()} ${MONTHS_GEN[d.getMonth()]} · ${v.time}</div>
+          <div class="booking-service">${v.service}</div>
+          <div class="booking-price">${v.amount} Br</div>
+          <div class="booking-warning">⚠️ Для отмены свяжитесь с мастером:<br>📞 ${masterProfile.phone} · ✈️ ${masterProfile.tg}</div>
+        `;
+        container.appendChild(card);
+      });
+    }
       });
 
       myBookings.sort((a, b) => new Date(a.date + 'T' + a.time) - new Date(b.date + 'T' + b.time));
