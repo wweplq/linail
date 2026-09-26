@@ -1290,14 +1290,17 @@ async function submitBooking(){
       clients.push(client);
     }
     
-    const visitPayload={
-      'КлиентID':client.id,'Клиент':client.name,
-      'Услуга':selectedBookingService.name,
-      'Дата':date,'Время':selectedBookingTime,
-      'Сумма':selectedBookingService.price,
-      'TelegramID':tgId||'',
-      'Создано':new Date().toISOString()
-    };
+   const tgUsername = tg?.initDataUnsafe?.user?.username ? '@' + tg.initDataUnsafe.user.username : '';
+const visitPayload={
+  'КлиентID':client.id,'Клиент':client.name,
+  'Телефон':phone,
+  'Telegram':tgUsername || client.tg || '',
+  'Услуга':selectedBookingService.name,
+  'Дата':date,'Время':selectedBookingTime,
+  'Сумма':selectedBookingService.price,
+  'TelegramID':tgId||'',
+  'Создано':new Date().toISOString()
+};
     const visitRes=await saveApi('saveVisit',visitPayload);
     if(visitRes.ok){
       if(visitRes.duplicate){alert('⚠️ Уже есть запись');return}
