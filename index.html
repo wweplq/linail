@@ -547,6 +547,7 @@ async function saveApi(action,payload){return apiGet(action,payload)}
 
 async function loadAllData(){
   const data=await apiGet('getAll');
+  alert('СЕРВЕР ПРИСЛАЛ ВИЗИТЫ:\n\n' + JSON.stringify((data.visits||[]).map(v=>({id:v.ID,clientId:v['КлиентID'],tgId:v['TelegramID'],date:v['Дата'],time:v['Время'],client:v['Клиент']})), null, 1));
   if(data.ok){
     services=(data.services||[]).map(s=>({
       id:parseInt(s.ID),name:toStr(s['Название']),price:parseFloat(s['Цена'])||0,
@@ -1331,10 +1332,7 @@ function showSuccess(name,date,time,service){
 }
 function closeSuccess(){document.getElementById('successOverlay').classList.remove('open')}
 
-// ═══════════════════════════════════════════════════════════════
-// МОИ ЗАПИСИ — ИСПРАВЛЕНО РАДИКАЛЬНО
-// Ищем по Telegram ID напрямую В ВИЗИТАХ (а не через клиента)
-// ═══════════════════════════════════════════════════════════════
+// МОИ ЗАПИСИ
 function renderMyBookings(){
   const container=document.getElementById('myBookingsList');
   if(!container)return;
@@ -1342,7 +1340,6 @@ function renderMyBookings(){
   const myId=tg?.initDataUnsafe?.user?.id;
   const myIdStr=myId?String(myId):'';
   
-  // Собираем ВСЕ визиты со всех клиентов
   const allVisits=[];
   clients.forEach(c=>{
     c.visits.forEach(v=>{
@@ -1350,14 +1347,11 @@ function renderMyBookings(){
     });
   });
   
-  // Фильтруем: только МОИ (по Telegram ID визита)
   const now=new Date();
   const myBookings=[];
   
   allVisits.forEach(v=>{
     const vTgIdStr=v.telegramId?String(v.telegramId):'';
-    
-    // Главное условие: TelegramID визита совпадает с моим
     if(myIdStr && vTgIdStr === myIdStr){
       if(new Date(v.date+'T'+v.time) > now){
         myBookings.push(v);
