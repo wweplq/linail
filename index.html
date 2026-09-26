@@ -640,7 +640,7 @@ body { padding-bottom: 40px; }
           <button class="btn-danger" onclick="resetData()">🗑 Сбросить все данные</button>
         </div>
         <div style="text-align: center; font-size: 12px; color: var(--text-muted); font-weight: 500; margin-top: 24px; line-height: 1.5;">
-          Linail Brest Mini App<br>v2.1
+          Linail Brest Mini App<br>v2.2
         </div>
       </div>
     </div>
@@ -856,8 +856,17 @@ body { padding-bottom: 40px; }
           telegramId: c['TelegramID'] ? Number(c['TelegramID']) : null,
           createdAt: toStr(c['Дата создания']), visits: []
         }));
+
+        // 🔥 ФИКС: привязка визита к клиенту по ID, а если не найдено — по имени
         (data.visits || []).forEach(v => {
-          const client = clients.find(c => c.id === parseInt(v['КлиентID']));
+          const clientId = parseInt(v['КлиентID']);
+          const clientName = toStr(v['Клиент']).trim();
+
+          let client = clients.find(c => c.id === clientId);
+          if (!client && clientName) {
+            client = clients.find(c => (c.name || '').trim().toLowerCase() === clientName.toLowerCase());
+          }
+
           if (client) {
             client.visits.push({
               id: parseInt(v.ID),
@@ -869,6 +878,7 @@ body { padding-bottom: 40px; }
             });
           }
         });
+
         expenses = (data.expenses || []).map(e => ({
           id: parseInt(e.ID), category: toStr(e['Категория']),
           amount: parseFloat(e['Сумма']) || 0, date: toStr(e['Дата']),
@@ -1709,24 +1719,23 @@ body { padding-bottom: 40px; }
       document.getElementById('successOverlay').classList.remove('open');
     }
 
-    // 🔥 МОИ ЗАПИСИ — сравнение через String (надёжно при любых типах)
-      function renderMyBookings() {
+    // 🔥 МОИ ЗАПИСИ — ищем по ID, username, имени
+    function renderMyBookings() {
       const container = document.getElementById('myBookingsList');
       if (!container) return;
 
-      // Получаем ID и имя пользователя из Telegram
       const myId = tg?.initDataUnsafe?.user?.id;
       const myUsername = tg?.initDataUnsafe?.user?.username;
       const myFirstName = tg?.initDataUnsafe?.user?.first_name;
       const myLastName = tg?.initDataUnsafe?.user?.last_name;
       const myFullName = ((myFirstName || '') + ' ' + (myLastName || '')).trim();
-      
-      // Формируем список всех вариантов, по которым искать
+
       const myVariants = [
         myId ? String(myId).trim() : '',
         myUsername ? myUsername.toLowerCase().trim() : '',
         myUsername ? ('@' + myUsername).toLowerCase().trim() : '',
-        myFullName.toLowerCase().trim()
+        myFullName.toLowerCase().trim(),
+        myFirstName ? myFirstName.toLowerCase().trim() : ''
       ].filter(v => v);
 
       if (myVariants.length === 0) {
@@ -1738,45 +1747,23 @@ body { padding-bottom: 40px; }
       const myBookings = [];
 
       clients.forEach(c => {
-        // Проверяем — это МОЙ клиент?
-        const clientMatches = 
-          myVariants.includes(String(c.telegramId || '').trim()) ||
-          myVariants.includes(String(c.tg || '').toLowerCase().trim()) ||
-          myVariants.includes(String(c.name || '').toLowerCase().trim());
+        const clientNameLower = String(c.name || '').toLowerCase().trim();
+        const clientTgLower = String(c.tg || '').toLowerCase().trim();
+        const clientTgId = String(c.telegramId || '').trim();
+
+        const clientMatches =
+          (clientTgId && myVariants.includes(clientTgId)) ||
+          (clientTgLower && myVariants.includes(clientTgLower)) ||
+          (clientNameLower && myVariants.includes(clientNameLower));
 
         if (!clientMatches) return;
 
-        // Берём его будущие визиты
         c.visits.forEach(v => {
           const visitDate = new Date(v.date + 'T' + v.time);
           if (visitDate > now) {
             myBookings.push(v);
           }
         });
-      });
-
-      myBookings.sort((a, b) => new Date(a.date + 'T' + a.time) - new Date(b.date + 'T' + b.time));
-
-      if (myBookings.length === 0) {
-        container.innerHTML = '<div class="card" style="text-align:center; padding: 24px; color: var(--text-muted); font-size: 14px; font-weight: 500;">У вас пока нет записей</div>';
-        return;
-      }
-
-      container.innerHTML = '';
-      myBookings.forEach(v => {
-        const d = new Date(v.date);
-        const dayName = DAYS_FULL[d.getDay()].substring(0, 2);
-        const card = document.createElement('div');
-        card.className = 'booking-card';
-        card.innerHTML = `
-          <div class="booking-date">${dayName}, ${d.getDate()} ${MONTHS_GEN[d.getMonth()]} · ${v.time}</div>
-          <div class="booking-service">${v.service}</div>
-          <div class="booking-price">${v.amount} Br</div>
-          <div class="booking-warning">⚠️ Для отмены свяжитесь с мастером:<br>📞 ${masterProfile.phone} · ✈️ ${masterProfile.tg}</div>
-        `;
-        container.appendChild(card);
-      });
-    }
       });
 
       myBookings.sort((a, b) => new Date(a.date + 'T' + a.time) - new Date(b.date + 'T' + b.time));
