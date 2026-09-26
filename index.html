@@ -308,7 +308,7 @@ body{padding-bottom:40px}
         <button class="header-menu" onclick="toggleMenu()">☰</button>
       </div>
       <div class="header-date" id="homeDate">—</div>
-      <div class="header-day" id="homeDay">—</div>
+      <div class="header-date-sub" id="homeDay">—</div>
       <div class="header-actions">
         <button class="btn-glass" onclick="showScreen('windows')">📅 Окна</button>
         <button class="btn-glass" onclick="showScreen('reminders')">🔔 Напоминания</button>
@@ -547,7 +547,6 @@ async function saveApi(action,payload){return apiGet(action,payload)}
 
 async function loadAllData(){
   const data=await apiGet('getAll');
-  console.log('[getAll] raw:', data);
   if(data.ok){
     services=(data.services||[]).map(s=>({
       id:parseInt(s.ID),name:toStr(s['Название']),price:parseFloat(s['Цена'])||0,
@@ -1332,51 +1331,38 @@ function showSuccess(name,date,time,service){
 }
 function closeSuccess(){document.getElementById('successOverlay').classList.remove('open')}
 
-// МОИ ЗАПИСИ — ИСПРАВЛЕНО: ищем напрямую по визитам, а не через клиентов
+// ═══════════════════════════════════════════════════════════════
+// МОИ ЗАПИСИ — ИСПРАВЛЕНО РАДИКАЛЬНО
+// Ищем по Telegram ID напрямую В ВИЗИТАХ (а не через клиента)
+// ═══════════════════════════════════════════════════════════════
 function renderMyBookings(){
   const container=document.getElementById('myBookingsList');
   if(!container)return;
   
   const myId=tg?.initDataUnsafe?.user?.id;
-  const myUsername=tg?.initDataUnsafe?.user?.username;
-  const myFirstName=tg?.initDataUnsafe?.user?.first_name;
-  const myLastName=tg?.initDataUnsafe?.user?.last_name;
-  const myFullName=((myFirstName||'')+' '+(myLastName||'')).trim();
-  
-  if(!myId&&!myUsername&&!myFullName){
-    container.innerHTML='<div class="card" style="text-align:center;padding:24px;color:var(--text-muted);font-size:14px;font-weight:500">Откройте через Telegram</div>';
-    return;
-  }
-  
   const myIdStr=myId?String(myId):'';
-  const myUserLower=myUsername?myUsername.toLowerCase():'';
-  const myFullLower=myFullName.toLowerCase();
-  const myFirstLower=(myFirstName||'').toLowerCase();
   
+  // Собираем ВСЕ визиты со всех клиентов
+  const allVisits=[];
+  clients.forEach(c=>{
+    c.visits.forEach(v=>{
+      allVisits.push({...v, clientName:c.name, clientPhone:c.phone, clientTg:c.tg});
+    });
+  });
+  
+  // Фильтруем: только МОИ (по Telegram ID визита)
   const now=new Date();
   const myBookings=[];
   
-  clients.forEach(c=>{
-    const cName=(c.name||'').trim().toLowerCase();
-    const cTg=(c.tg||'').trim().toLowerCase();
-    const cTgIdStr=c.telegramId?String(c.telegramId):'';
+  allVisits.forEach(v=>{
+    const vTgIdStr=v.telegramId?String(v.telegramId):'';
     
-    c.visits.forEach(v=>{
-      const vTgIdStr=v.telegramId?String(v.telegramId):'';
-      
-      const matchById = myIdStr && (vTgIdStr===myIdStr || cTgIdStr===myIdStr);
-      const matchByUsername = myUserLower && (cTg==='@'+myUserLower || cTg===myUserLower);
-      const matchByName = (myFullLower && cName===myFullLower) || (myFirstLower && cName===myFirstLower);
-      
-      if(!matchById && !matchByUsername && !matchByName) return;
-      
-      if(new Date(v.date+'T'+v.time)>now){
-        const key=v.date+'_'+v.time+'_'+v.service;
-        if(!myBookings.find(b=>b.date+'_'+b.time+'_'+b.service===key)){
-          myBookings.push(v);
-        }
+    // Главное условие: TelegramID визита совпадает с моим
+    if(myIdStr && vTgIdStr === myIdStr){
+      if(new Date(v.date+'T'+v.time) > now){
+        myBookings.push(v);
       }
-    });
+    }
   });
   
   myBookings.sort((a,b)=>new Date(a.date+'T'+a.time)-new Date(b.date+'T'+b.time));
