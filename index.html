@@ -308,7 +308,7 @@ body{padding-bottom:40px}
         <button class="header-menu" onclick="toggleMenu()">☰</button>
       </div>
       <div class="header-date" id="homeDate">—</div>
-      <div class="header-date-sub" id="homeDay">—</div>
+      <div class="header-day" id="homeDay">—</div>
       <div class="header-actions">
         <button class="btn-glass" onclick="showScreen('windows')">📅 Окна</button>
         <button class="btn-glass" onclick="showScreen('reminders')">🔔 Напоминания</button>
@@ -547,6 +547,7 @@ async function saveApi(action,payload){return apiGet(action,payload)}
 
 async function loadAllData(){
   const data=await apiGet('getAll');
+  console.log('[getAll] raw:', data);
   if(data.ok){
     services=(data.services||[]).map(s=>({
       id:parseInt(s.ID),name:toStr(s['Название']),price:parseFloat(s['Цена'])||0,
@@ -564,13 +565,11 @@ async function loadAllData(){
       const clientId=parseInt(v['КлиентID']);
       const clientName=toStr(v['Клиент']).trim();
       
-      // Ищем клиента по ID, потом по имени, потом по телефону
       let client=clients.find(c=>c.id===clientId);
       if(!client&&clientName){
         client=clients.find(c=>(c.name||'').trim().toLowerCase()===clientName.toLowerCase());
       }
       
-      // Если клиента нет — создаём виртуального с тем же TelegramID
       if(!client){
         client={
           id:'virt_'+v.ID,
@@ -1266,7 +1265,6 @@ async function submitBooking(){
     const myDigits=phoneDigits(phone);
     const myLast9=myDigits.slice(-9);
     
-    // Ищем клиента по TelegramID, потом по последним 9 цифрам телефона
     let client=null;
     if(tgId)client=clients.find(c=>c.telegramId&&Number(c.telegramId)===Number(tgId));
     if(!client&&myLast9){
@@ -1334,7 +1332,7 @@ function showSuccess(name,date,time,service){
 }
 function closeSuccess(){document.getElementById('successOverlay').classList.remove('open')}
 
-// МОИ ЗАПИСИ — ищем по TelegramID, username, имени
+// МОИ ЗАПИСИ — ИСПРАВЛЕНО: ищем напрямую по визитам, а не через клиентов
 function renderMyBookings(){
   const container=document.getElementById('myBookingsList');
   if(!container)return;
@@ -1363,17 +1361,21 @@ function renderMyBookings(){
     const cTg=(c.tg||'').trim().toLowerCase();
     const cTgIdStr=c.telegramId?String(c.telegramId):'';
     
-    const match=
-      (myIdStr&&cTgIdStr&&cTgIdStr===myIdStr)||
-      (myUserLower&&cTg==='@'+myUserLower)||
-      (myUserLower&&cTg===myUserLower)||
-      (myFullLower&&cName===myFullLower)||
-      (myFirstLower&&cName===myFirstLower);
-    
-    if(!match)return;
-    
     c.visits.forEach(v=>{
-      if(new Date(v.date+'T'+v.time)>now)myBookings.push(v);
+      const vTgIdStr=v.telegramId?String(v.telegramId):'';
+      
+      const matchById = myIdStr && (vTgIdStr===myIdStr || cTgIdStr===myIdStr);
+      const matchByUsername = myUserLower && (cTg==='@'+myUserLower || cTg===myUserLower);
+      const matchByName = (myFullLower && cName===myFullLower) || (myFirstLower && cName===myFirstLower);
+      
+      if(!matchById && !matchByUsername && !matchByName) return;
+      
+      if(new Date(v.date+'T'+v.time)>now){
+        const key=v.date+'_'+v.time+'_'+v.service;
+        if(!myBookings.find(b=>b.date+'_'+b.time+'_'+b.service===key)){
+          myBookings.push(v);
+        }
+      }
     });
   });
   
