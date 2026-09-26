@@ -640,7 +640,7 @@ body { padding-bottom: 40px; }
           <button class="btn-danger" onclick="resetData()">🗑 Сбросить все данные</button>
         </div>
         <div style="text-align: center; font-size: 12px; color: var(--text-muted); font-weight: 500; margin-top: 24px; line-height: 1.5;">
-          Linail Brest Mini App<br>v2.2
+          Linail Brest Mini App<br>v3.0
         </div>
       </div>
     </div>
@@ -827,6 +827,7 @@ body { padding-bottom: 40px; }
     }
 
     function toStr(v) { return v == null ? '' : String(v); }
+    function phoneDigits(v) { return toStr(v).replace(/\D/g, ''); }
 
     async function apiGet(action, payload) {
       try {
@@ -839,7 +840,7 @@ body { padding-bottom: 40px; }
         return { ok: false, error: err.message };
       }
     }
-    async function apiSave(action, payload) { return apiGet(action, payload); }
+    async function saveApi(action, payload) { return apiGet(action, payload); }
 
     async function loadAllData() {
       const data = await apiGet('getAll');
@@ -849,6 +850,7 @@ body { padding-bottom: 40px; }
           duration: parseInt(s['Длительность']) || 60, desc: toStr(s['Описание']),
           active: s['Активна'] === true || s['Активна'] === 'TRUE'
         }));
+
         clients = (data.clients || []).map(c => ({
           id: parseInt(c.ID), name: toStr(c['Имя']), phone: toStr(c['Телефон']),
           tg: toStr(c['Telegram']), inst: toStr(c['Instagram']),
@@ -857,7 +859,7 @@ body { padding-bottom: 40px; }
           createdAt: toStr(c['Дата создания']), visits: []
         }));
 
-        // 🔥 ФИКС: привязка визита к клиенту по ID, а если не найдено — по имени
+        // 🔥 Привязка визита: сначала по ID, потом по имени, иначе создаём "виртуального" клиента
         (data.visits || []).forEach(v => {
           const clientId = parseInt(v['КлиентID']);
           const clientName = toStr(v['Клиент']).trim();
@@ -866,17 +868,24 @@ body { padding-bottom: 40px; }
           if (!client && clientName) {
             client = clients.find(c => (c.name || '').trim().toLowerCase() === clientName.toLowerCase());
           }
-
-          if (client) {
-            client.visits.push({
-              id: parseInt(v.ID),
-              date: formatDateOnly(v['Дата']),
-              time: toStr(v['Время']).substring(0, 5),
-              service: toStr(v['Услуга']),
-              amount: parseFloat(v['Сумма']) || 0,
-              telegramId: v['TelegramID'] ? Number(v['TelegramID']) : null
-            });
+          if (!client) {
+            client = {
+              id: -Date.now() - Math.floor(Math.random() * 1000),
+              name: clientName || 'Клиент', phone: '', tg: '', inst: '', notes: '',
+              telegramId: v['TelegramID'] ? Number(v['TelegramID']) : null,
+              createdAt: '', visits: []
+            };
+            clients.push(client);
           }
+
+          client.visits.push({
+            id: parseInt(v.ID),
+            date: formatDateOnly(v['Дата']),
+            time: toStr(v['Время']).substring(0, 5),
+            service: toStr(v['Услуга']),
+            amount: parseFloat(v['Сумма']) || 0,
+            telegramId: v['TelegramID'] ? Number(v['TelegramID']) : null
+          });
         });
 
         expenses = (data.expenses || []).map(e => ({
@@ -884,6 +893,7 @@ body { padding-bottom: 40px; }
           amount: parseFloat(e['Сумма']) || 0, date: toStr(e['Дата']),
           comment: toStr(e['Комментарий'])
         }));
+
         const settings = data.settings || {};
         masterProfile = {
           name: toStr(settings['Имя мастера']) || 'Мастер',
@@ -917,14 +927,14 @@ body { padding-bottom: 40px; }
       const photo = masterProfile.photo;
       if (!photo) return;
       const img = `<img src="${photo}" alt="">`;
-      const topAvatar = document.getElementById('masterAvatarTop');
-      const clientAvatar = document.getElementById('clientAvatarTop');
-      const menuAvatar = document.getElementById('menuAvatar');
-      const profileAvatar = document.getElementById('profileAvatarPreview');
-      if (topAvatar) topAvatar.innerHTML = img;
-      if (clientAvatar) clientAvatar.innerHTML = img;
-      if (menuAvatar) menuAvatar.innerHTML = img;
-      if (profileAvatar) profileAvatar.innerHTML = img;
+      const t = document.getElementById('masterAvatarTop');
+      const c = document.getElementById('clientAvatarTop');
+      const m = document.getElementById('menuAvatar');
+      const p = document.getElementById('profileAvatarPreview');
+      if (t) t.innerHTML = img;
+      if (c) c.innerHTML = img;
+      if (m) m.innerHTML = img;
+      if (p) p.innerHTML = img;
     }
 
     function updateMasterInfo() {
@@ -1218,7 +1228,7 @@ body { padding-bottom: 40px; }
       if (!name) { alert('Введите название'); return; }
       if (!price || price < 0) { alert('Введите цену'); return; }
       const payload = { ID: editingServiceId, 'Название': name, 'Цена': price, 'Длительность': duration, 'Описание': desc, 'Активна': true };
-      const res = await apiSave('saveService', payload);
+      const res = await saveApi('saveService', payload);
       if (res.ok) {
         if (editingServiceId) {
           const s = services.find(x => x.id === editingServiceId);
@@ -1236,7 +1246,7 @@ body { padding-bottom: 40px; }
       const s = services.find(x => x.id === id);
       if (!s) return;
       if (!confirm('Удалить "' + s.name + '"?')) return;
-      const res = await apiSave('deleteService', { ID: id });
+      const res = await saveApi('deleteService', { ID: id });
       if (res.ok) {
         services = services.filter(x => x.id !== id);
         renderServices();
@@ -1248,7 +1258,7 @@ body { padding-bottom: 40px; }
       const s = services.find(x => x.id === id);
       if (!s) return;
       s.active = !s.active;
-      await apiSave('saveService', { ID: s.id, 'Название': s.name, 'Цена': s.price, 'Длительность': s.duration, 'Описание': s.desc, 'Активна': s.active });
+      await saveApi('saveService', { ID: s.id, 'Название': s.name, 'Цена': s.price, 'Длительность': s.duration, 'Описание': s.desc, 'Активна': s.active });
       renderServices();
       renderClientPriceList();
     }
@@ -1363,7 +1373,7 @@ body { padding-bottom: 40px; }
     function callClient() {
       const c = clients.find(x => x.id === currentClientId);
       if (!c || !c.phone) { alert('У клиента нет телефона'); return; }
-      window.location.href = 'tel:' + c.phone.replace(/[^\d+]/g, '');
+      window.location.href = 'tel:' + phoneDigits(c.phone);
     }
     function writeClient() {
       const c = clients.find(x => x.id === currentClientId);
@@ -1375,7 +1385,7 @@ body { padding-bottom: 40px; }
       const c = clients.find(x => x.id === currentClientId);
       if (!c) return;
       c.notes = document.getElementById('clientProfileNotes').value.trim();
-      await apiSave('saveClient', { ID: c.id, 'Имя': c.name, 'Телефон': c.phone, 'Telegram': c.tg, 'Instagram': c.inst, 'Заметки': c.notes, 'TelegramID': c.telegramId || '', 'Дата создания': c.createdAt });
+      await saveApi('saveClient', { ID: c.id, 'Имя': c.name, 'Телефон': c.phone, 'Telegram': c.tg, 'Instagram': c.inst, 'Заметки': c.notes, 'TelegramID': c.telegramId || '', 'Дата создания': c.createdAt });
       alert('✅ Заметки сохранены');
     }
     async function saveClient() {
@@ -1385,7 +1395,7 @@ body { padding-bottom: 40px; }
       const notes = document.getElementById('clientNotesInput').value.trim();
       if (!name) { alert('Введите имя'); return; }
       const payload = { ID: editingClientId, 'Имя': name, 'Телефон': phone, 'Telegram': tg_, 'Instagram': '', 'Заметки': notes, 'TelegramID': '', 'Дата создания': new Date().toISOString().split('T')[0] };
-      const res = await apiSave('saveClient', payload);
+      const res = await saveApi('saveClient', payload);
       if (res.ok) {
         if (editingClientId) {
           const c = clients.find(x => x.id === editingClientId);
@@ -1402,7 +1412,7 @@ body { padding-bottom: 40px; }
       const c = clients.find(x => x.id === editingClientId);
       if (!c) return;
       if (!confirm('Удалить "' + c.name + '"?')) return;
-      const res = await apiSave('deleteClient', { ID: editingClientId });
+      const res = await saveApi('deleteClient', { ID: editingClientId });
       if (res.ok) {
         clients = clients.filter(x => x.id !== editingClientId);
         renderClients();
@@ -1421,7 +1431,7 @@ body { padding-bottom: 40px; }
       if (!date) { alert('Выберите дату'); return; }
       if (!amount || amount <= 0) { alert('Введите сумму'); return; }
       const payload = { 'КлиентID': c.id, 'Клиент': c.name, 'Услуга': opt.dataset.name, 'Дата': date, 'Время': time, 'Сумма': amount, 'TelegramID': c.telegramId || '', 'Создано': new Date().toISOString() };
-      const res = await apiSave('saveVisit', payload);
+      const res = await saveApi('saveVisit', payload);
       if (res.ok) {
         c.visits.unshift({ id: res.id, date, time, service: opt.dataset.name, amount, telegramId: c.telegramId });
         renderClients();
@@ -1538,7 +1548,7 @@ body { padding-bottom: 40px; }
       const category = selected ? selected.dataset.cat : 'Прочее';
       if (!amount || amount <= 0) { alert('Введите сумму'); return; }
       if (!date) { alert('Выберите дату'); return; }
-      const res = await apiSave('saveExpense', { 'Категория': category, 'Сумма': amount, 'Дата': date, 'Комментарий': comment });
+      const res = await saveApi('saveExpense', { 'Категория': category, 'Сумма': amount, 'Дата': date, 'Комментарий': comment });
       if (res.ok) {
         expenses.push({ id: res.id || Date.now(), category, amount, date, comment });
         renderFinance();
@@ -1589,16 +1599,13 @@ body { padding-bottom: 40px; }
       grid.innerHTML = '';
       const times = ['11:00', '13:00', '15:00', '17:00', '19:00'];
       selectedBookingTime = null;
-
       times.forEach(time => {
         const booked = isTimeBooked(date, time);
         const slot = document.createElement('div');
         slot.className = 'time-slot' + (booked ? ' booked' : '');
         slot.textContent = time;
-
-        if (booked) {
-          slot.style.cursor = 'not-allowed';
-        } else {
+        if (booked) { slot.style.cursor = 'not-allowed'; }
+        else {
           slot.onclick = () => {
             document.querySelectorAll('#bookingTimeGrid .time-slot').forEach(s => s.classList.remove('selected'));
             slot.classList.add('selected');
@@ -1622,7 +1629,6 @@ body { padding-bottom: 40px; }
 
     async function submitBooking() {
       if (bookingSubmitting) return;
-
       const date = document.getElementById('bookingDate').value;
       const name = document.getElementById('bookingName').value.trim();
       const phone = document.getElementById('bookingPhone').value.trim();
@@ -1631,7 +1637,6 @@ body { padding-bottom: 40px; }
       if (!selectedBookingTime) { alert('Выберите время'); return; }
       if (!name) { alert('Введите имя'); return; }
       if (!phone) { alert('Введите телефон'); return; }
-
       if (isTimeBooked(date, selectedBookingTime)) {
         alert('⚠️ Это время уже занято. Выберите другое.');
         renderTimeSlots();
@@ -1640,15 +1645,27 @@ body { padding-bottom: 40px; }
 
       bookingSubmitting = true;
       const btn = document.getElementById('submitBookingBtn');
-      const originalText = btn.textContent;
+      const orig = btn.textContent;
       btn.disabled = true;
       btn.textContent = '⏳ Отправка...';
 
       try {
         const tgId = tg?.initDataUnsafe?.user?.id ? Number(tg.initDataUnsafe.user.id) : null;
-        const normalizedPhone = toStr(phone).replace(/\D/g, ''); // только цифры
-        let client = clients.find(c => c.phone && toStr(c.phone).replace(/[^\d+]/g, '') === normalizedPhone);
+        const myDigits = phoneDigits(phone);
+        const myLast9 = myDigits.slice(-9);
 
+        // 1. Ищем по TelegramID
+        let client = null;
+        if (tgId) client = clients.find(c => c.telegramId && Number(c.telegramId) === Number(tgId));
+        // 2. Ищем по последним 9 цифрам телефона
+        if (!client && myLast9) {
+          client = clients.find(c => {
+            const cDigits = phoneDigits(c.phone);
+            return cDigits && cDigits.slice(-9) === myLast9;
+          });
+        }
+
+        // 3. Создаём нового
         if (!client) {
           const clientPayload = {
             'Имя': name, 'Телефон': phone,
@@ -1656,8 +1673,8 @@ body { padding-bottom: 40px; }
             'Instagram': '', 'Заметки': '', 'TelegramID': tgId || '',
             'Дата создания': new Date().toISOString().split('T')[0]
           };
-          const clientRes = await apiSave('saveClient', clientPayload);
-          if (!clientRes.ok) { alert('Ошибка создания клиента: ' + (clientRes.error || '?')); return; }
+          const clientRes = await saveApi('saveClient', clientPayload);
+          if (!clientRes.ok) { alert('Ошибка: ' + (clientRes.error || '?')); return; }
           client = {
             id: clientRes.id, name, phone,
             tg: clientPayload['Telegram'], inst: '', notes: '',
@@ -1674,30 +1691,20 @@ body { padding-bottom: 40px; }
           'TelegramID': tgId || '',
           'Создано': new Date().toISOString()
         };
-        const visitRes = await apiSave('saveVisit', visitPayload);
-
+        const visitRes = await saveApi('saveVisit', visitPayload);
         if (visitRes.ok) {
-          if (visitRes.duplicate) {
-            alert('⚠️ У вас уже есть запись на это время');
-            return;
-          }
-          client.visits.unshift({
-            id: visitRes.id, date, time: selectedBookingTime,
-            service: selectedBookingService.name,
-            amount: selectedBookingService.price, telegramId: tgId
-          });
+          if (visitRes.duplicate) { alert('⚠️ У вас уже есть запись на это время'); return; }
+          client.visits.unshift({ id: visitRes.id, date, time: selectedBookingTime, service: selectedBookingService.name, amount: selectedBookingService.price, telegramId: tgId });
           renderClients();
           renderFinance();
           renderMyBookings();
           document.getElementById('modalBooking').classList.remove('open');
           showSuccess(name, date, selectedBookingTime, selectedBookingService);
-        } else {
-          alert('Ошибка записи: ' + (visitRes.error || '?'));
-        }
+        } else alert('Ошибка: ' + (visitRes.error || '?'));
       } finally {
         bookingSubmitting = false;
         btn.disabled = false;
-        btn.textContent = originalText;
+        btn.textContent = orig;
       }
     }
 
@@ -1715,11 +1722,9 @@ body { padding-bottom: 40px; }
       document.getElementById('successOverlay').classList.add('open');
       if (tg) tg.HapticFeedback?.notificationOccurred('success');
     }
-    function closeSuccess() {
-      document.getElementById('successOverlay').classList.remove('open');
-    }
+    function closeSuccess() { document.getElementById('successOverlay').classList.remove('open'); }
 
-    // 🔥 МОИ ЗАПИСИ — ищем по ID, username, имени
+    // 🔥 МОИ ЗАПИСИ — ищем совпадение по ID, username, телефону, имени
     function renderMyBookings() {
       const container = document.getElementById('myBookingsList');
       if (!container) return;
@@ -1730,15 +1735,13 @@ body { padding-bottom: 40px; }
       const myLastName = tg?.initDataUnsafe?.user?.last_name;
       const myFullName = ((myFirstName || '') + ' ' + (myLastName || '')).trim();
 
-      const myVariants = [
-        myId ? String(myId).trim() : '',
-        myUsername ? myUsername.toLowerCase().trim() : '',
-        myUsername ? ('@' + myUsername).toLowerCase().trim() : '',
-        myFullName.toLowerCase().trim(),
-        myFirstName ? myFirstName.toLowerCase().trim() : ''
-      ].filter(v => v);
+      const myIdStr = myId ? String(myId) : '';
+      const myUserLower = myUsername ? myUsername.toLowerCase() : '';
+      const myUserAtLower = myUsername ? ('@' + myUsername).toLowerCase() : '';
+      const myFullLower = myFullName.toLowerCase();
+      const myFirstLower = (myFirstName || '').toLowerCase();
 
-      if (myVariants.length === 0) {
+      if (!myIdStr && !myUserLower && !myFullLower) {
         container.innerHTML = '<div class="card" style="text-align:center; padding: 24px; color: var(--text-muted); font-size: 14px; font-weight: 500;">Откройте через Telegram</div>';
         return;
       }
@@ -1747,22 +1750,21 @@ body { padding-bottom: 40px; }
       const myBookings = [];
 
       clients.forEach(c => {
-        const clientNameLower = String(c.name || '').toLowerCase().trim();
-        const clientTgLower = String(c.tg || '').toLowerCase().trim();
-        const clientTgId = String(c.telegramId || '').trim();
+        const cName = (c.name || '').trim().toLowerCase();
+        const cTg = (c.tg || '').trim().toLowerCase();
+        const cTgIdStr = c.telegramId ? String(c.telegramId) : '';
 
-        const clientMatches =
-          (clientTgId && myVariants.includes(clientTgId)) ||
-          (clientTgLower && myVariants.includes(clientTgLower)) ||
-          (clientNameLower && myVariants.includes(clientNameLower));
+        const match =
+          (myIdStr && cTgIdStr && cTgIdStr === myIdStr) ||
+          (myUserLower && cTg === myUserLower) ||
+          (myUserAtLower && cTg === myUserAtLower) ||
+          (myFullLower && cName === myFullLower) ||
+          (myFirstLower && cName === myFirstLower);
 
-        if (!clientMatches) return;
+        if (!match) return;
 
         c.visits.forEach(v => {
-          const visitDate = new Date(v.date + 'T' + v.time);
-          if (visitDate > now) {
-            myBookings.push(v);
-          }
+          if (new Date(v.date + 'T' + v.time) > now) myBookings.push(v);
         });
       });
 
@@ -1789,7 +1791,7 @@ body { padding-bottom: 40px; }
       });
     }
 
-    // ═══ ПРОФИЛЬ + АВАТАРКА ═══
+    // ═══ ПРОФИЛЬ ═══
     function renderProfileInputs() {
       document.getElementById('profileName').value = masterProfile.name || '';
       document.getElementById('profileStudio').value = masterProfile.studio || '';
@@ -1809,7 +1811,7 @@ body { padding-bottom: 40px; }
         'Instagram': document.getElementById('profileInst').value.trim(),
         'Адрес': document.getElementById('profileAddress').value.trim()
       };
-      const res = await apiSave('saveSettings', payload);
+      const res = await saveApi('saveSettings', payload);
       if (res.ok) {
         Object.assign(masterProfile, { name: payload['Имя мастера'], studio: payload['Студия'], desc: payload['Описание'], phone: payload['Телефон'], tg: payload['Telegram'], inst: payload['Instagram'], address: payload['Адрес'] });
         updateMasterInfo();
@@ -1817,16 +1819,11 @@ body { padding-bottom: 40px; }
         alert('✅ Профиль сохранён');
       } else alert('Ошибка: ' + (res.error || '?'));
     }
-
-    function changeAvatar() {
-      document.getElementById('avatarFileInput').click();
-    }
-
+    function changeAvatar() { document.getElementById('avatarFileInput').click(); }
     async function handleAvatarUpload(event) {
       const file = event.target.files[0];
       if (!file) return;
       if (file.size > 2 * 1024 * 1024) { alert('Фото слишком большое (макс 2 МБ)'); return; }
-
       const reader = new FileReader();
       reader.onload = async (e) => {
         const base64 = e.target.result;
@@ -1843,12 +1840,8 @@ body { padding-bottom: 40px; }
             renderMasterAvatar();
             if (tg) tg.HapticFeedback?.notificationOccurred('success');
             alert('✅ Фото обновлено!');
-          } else {
-            alert('Ошибка: ' + (data.error || 'неизвестно'));
-          }
-        } catch (err) {
-          alert('Ошибка загрузки: ' + err.message);
-        }
+          } else alert('Ошибка: ' + (data.error || '?'));
+        } catch (err) { alert('Ошибка загрузки: ' + err.message); }
       };
       reader.readAsDataURL(file);
     }
