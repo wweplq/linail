@@ -1646,7 +1646,7 @@ body { padding-bottom: 40px; }
 
       try {
         const tgId = tg?.initDataUnsafe?.user?.id ? Number(tg.initDataUnsafe.user.id) : null;
-        const normalizedPhone = toStr(phone).replace(/[^\d+]/g, '');
+        const normalizedPhone = toStr(phone).replace(/\D/g, ''); // только цифры
         let client = clients.find(c => c.phone && toStr(c.phone).replace(/[^\d+]/g, '') === normalizedPhone);
 
         if (!client) {
