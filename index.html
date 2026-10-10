@@ -452,7 +452,7 @@ body{padding-bottom:40px}
     <div class="content">
       <div class="section-label">Опасная зона</div>
       <div class="card"><button class="btn-danger" onclick="resetData()">🗑 Сбросить все данные</button></div>
-      <div style="text-align:center;font-size:12px;color:var(--text-muted);font-weight:500;margin-top:24px">Linail Brest<br>v5.1</div>
+      <div style="text-align:center;font-size:12px;color:var(--text-muted);font-weight:500;margin-top:24px">Linail Brest<br>v5.2</div>
     </div>
   </div>
   <div class="bottom-nav">
@@ -801,13 +801,13 @@ function renderMonthGrid(){
     const date=new Date(year,month,day);
     const key=dateToStr(date);
     const dayOfWeek=date.getDay();
-    const isWeekend=dayOfWeek===0||dayOfWeek===6;
-    const isDayOff=daysOff[key]||isWeekend;
+    // ВСЕ ДНИ РАБОЧИЕ по умолчанию. Выходной = только если в daysOff.
+    const isDayOff=daysOff[key]===true;
     const isToday=date.getTime()===today.getTime();
     const row=document.createElement('div');
     row.className='month-grid-row';
     const dayLabel=document.createElement('div');
-    dayLabel.className='month-grid-day'+(isToday?' today':'')+(isWeekend?' weekend':'');
+    dayLabel.className='month-grid-day'+(isToday?' today':'');
     dayLabel.textContent=day+' '+['вс','пн','вт','ср','чт','пт','сб'][dayOfWeek];
     row.appendChild(dayLabel);
     times.forEach(time=>{
@@ -819,12 +819,10 @@ function renderMonthGrid(){
         cell.textContent=visit?'●':time.split(':')[0];
       }
       cell.onclick=()=>{
-        if(!isDayOff){
-          currentDate=new Date(year,month,day);
-          updateDateDisplay();
-          updateDayOffButton();
-          switchView('day');
-        }
+        currentDate=new Date(year,month,day);
+        updateDateDisplay();
+        updateDayOffButton();
+        switchView('day');
       };
       row.appendChild(cell);
     });
@@ -904,17 +902,8 @@ async function generateMonth(){
   document.getElementById('modalGenerateMonth').classList.remove('open');
   const [year,month]=monthInput.split('-').map(Number);
   const daysInMonth=new Date(year,month,0).getDate();
-  let count=0;
-  for(let day=1;day<=daysInMonth;day++){
-    const d=new Date(year,month-1,day);
-    const dow=d.getDay();
-    if(dow===0||dow===6)continue;
-    const key=dateToStr(d);
-    if(!daysOff[key]){
-      count++;
-    }
-  }
-  alert('🚀 Готово!\n\nНа месяц открыто '+count+' рабочих дней.\nВыходные (сб, вс) — закрыты автоматически.');
+  // ВСЕ ДНИ рабочие. Ничего не блокируем.
+  alert('🚀 Готово!\n\nВсе '+daysInMonth+' дней месяца открыты для записи.\n\nЕсли нужен выходной — зайдите на конкретный день и нажмите «Сделать выходным».');
 }
 
 async function makeDayOff(){
@@ -1373,7 +1362,7 @@ function renderTimeSlots(){
   grid.innerHTML='';
   const times=['11:00','13:00','15:00','17:00','19:00'];
   selectedBookingTime=null;
-  const dayOff=daysOff[date]||false;
+  const dayOff=daysOff[date]===true;
   times.forEach(time=>{
     const booked=isTimeBooked(date,time);
     const slot=document.createElement('div');
@@ -1490,7 +1479,7 @@ function showSuccess(name,date,time,service){
     <div class="success-info-row"><span class="success-info-icon">📅</span>${dayName}, ${d.getDate()} ${MONTHS_GEN[d.getMonth()]} · ${time}</div>
     <div class="success-info-row"><span class="success-info-icon">💅</span>${service.name}</div>
     <div class="success-info-row"><span class="success-info-icon">💰</span>${service.price} Br</div>
-    <div class="success-info-row"><span class="success-info-icon">📍</span>${masterProfile.address||''}</div>
+    <div class="success-info-row"><span class="success-info-icon">📍</span>${masterProfile.address||'Буденного 28, 3 этаж'}</div>
     <div class="success-info-row"><span class="success-info-icon">📞</span>${masterProfile.phone||''}</div>
   `;
   document.getElementById('successOverlay').classList.add('open');
